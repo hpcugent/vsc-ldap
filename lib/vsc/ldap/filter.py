@@ -209,7 +209,8 @@ class TimestampFilter(LdapFilter):
 
     def __str__(self):
         """Converts the filter to an LDAP understood string."""
-        return "(& (modifyTimestamp%s%s) %s)" % (self.comparator, self.timestamp, super(TimestampFilter, self).__str__())
+        return "(& (modifyTimestamp%s%s) %s)"
+               % (self.comparator, self.timestamp, super(TimestampFilter, self).__str__())
 
 
 class NewerThanFilter(TimestampFilter):
