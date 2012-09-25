@@ -81,7 +81,6 @@ class LdapVo(LdapEntity):
 
         @type ldap_attributes: dictionary with the LDAP field names and the associated values to insert.
         """
-        # FIXME: Not sure about this. Should we include 'top'? Should we hardcode this or have the client code code it?
         ldap_attributes['objectClass'] = ['posixGroup', 'vscgroup']
 
         self.ldap_query.vo_add(self.vo_id, ldap_attributes)

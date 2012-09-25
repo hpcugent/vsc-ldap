@@ -60,9 +60,6 @@ class LdapConnection(object):
         - search (synchronously, asynchronously)
         - modify
         - add
-
-    # FIXME: use a connection pool?
-
     """
     def __init__(self, configuration):
         """Initialisation. Not done lazily.

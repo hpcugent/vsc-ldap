@@ -152,7 +152,6 @@ class LdapUser(LdapEntity):
 
         @type ldap_attributes: dictionary with the LDAP field names and the associated values to insert.
         """
-        # FIXME: Not sure about this. Should we include 'top'? Should we hardcode this or have the client code code it?
         ldap_attributes['objectClass'] = ['posixAccount', 'vscuser']
 
         self.ldap_query.user_add(self.user_id, ldap_attributes)
