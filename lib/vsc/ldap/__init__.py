@@ -26,36 +26,48 @@ Provides:
 
 
 class NoSuchUserError(Exception):
+    """If a user cannot be found in the LDAP."""
     def __init__(self, name):
+        """Initialisation."""
         super(NoSuchUserError, self).__init__()
         self.name = name
 
 
 class UserAlreadyExistsError(Exception):
+    """If a user already is present in the LDAP, i.e., the dn already exists."""
     def __init__(self, name):
+        """Initialisation."""
         super(UserAlreadyExistsError, self).__init__()
         self.name = name
 
 
 class NoSuchVoError(Exception):
+    """If a VO cannot be found in the LDAP."""
     def __init__(self, name):
+        """Initialisation."""
         super(NoSuchVoError, self).__init__()
         self.name = name
 
 
 class NoSuchGroupError(Exception):
+    """If a group cannot be found in the LDAP."""
     def __init__(self, name):
+        """Initialisation."""
         super(NoSuchGroupError, self).__init__()
         self.name = name
 
 
 class NoSuchProjectError(Exception):
+    """If a project cannot be found in the LDAP."""
     def __init__(self, name):
+        """Initialisation."""
         super(NoSuchProjectError, self).__init__()
         self.name = name
 
 
 class GroupAlreadyExistsError(Exception):
+    """If a group is already present, i.e., the dn already exists."""
     def __init__(self, name):
+        """Initialisation."""
         super(GroupAlreadyExistsError, self).__init__()
         self.name = name
