@@ -98,7 +98,8 @@ class LdapQuery:
         self.logger.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.group_dn_base
         entries = self.ldap.search(filter, base, attributes)
-        results = [self.__delist_ldap_return_value(e, self.configuration.group_multi_value_attributes, attributes) for e in entries]
+        results = [self.__delist_ldap_return_value(e, self.configuration.group_multi_value_attributes, attributes)
+                   for e in entries]
         self.logger.debug("group_filter_search finds %d results" % (len(results)))
         return results
 
@@ -112,7 +113,8 @@ class LdapQuery:
 
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
-        self.logger.info("group_search: cn = %s, member_uid = %s, requested attributes = %s" % (cn, member_uid, attributes))
+        self.logger.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
+                         % (cn, member_uid, attributes))
         result = self.group_filter_search("(&(cn=%s) (memberUid=%s))" % (cn, member_uid), attributes)
         self.logger.debug("group_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
@@ -229,7 +231,8 @@ class LdapQuery:
         self.logger.info("project_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.project_dn_base
         entries = self.ldap.search(filter, base, attributes)
-        results = [self.__delist_ldap_return_value(e, self.configuration.project_multi_value_attributes, attributes) for e in entries]
+        results = [self.__delist_ldap_return_value(e, self.configuration.project_multi_value_attributes, attributes)
+                   for e in entries]
         self.logger.debug("project_filter_search finds %d results" % (len(results)))
         return results
 
@@ -255,7 +258,8 @@ class LdapQuery:
         self.logger.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.user_dn_base
         entries = self.ldap.search(filter, base, attributes)
-        results = [self.__delist_ldap_return_value(e, self.configuration.user_multi_value_attributes, attributes) for e in entries]
+        results = [self.__delist_ldap_return_value(e, self.configuration.user_multi_value_attributes, attributes)
+                   for e in entries]
         self.logger.debug("user_filter_search finds %d results" % (len(results)))
         return results
 
@@ -305,7 +309,9 @@ class LdapQuery:
         current_ = {}
         for key in attributes.keys():
             current_[key] = current.get(key, [])
-        modification_attributes = ldap.modlist.modifyModlist(current_, attributes)  # [(ldap.MOD_REPLACE, k, v) for (k,v) in attributes.iteritems()]
+        # [(ldap.MOD_REPLACE, k, v) for (k,v) in attributes.iteritems()]
+        modification_attributes = ldap.modlist.modifyModlist(current_, attributes)
+
         self.ldap.modify_attributes(dn, modification_attributes)
 
     def group_modify(self, cn, attributes):
@@ -321,7 +327,8 @@ class LdapQuery:
         if current is None:
             self.logger.error("group_modify did not find group with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchGroupError(cn)
-        self.logger.debug("group_modify current attribute values = %s - new attribute values = %s" % (current[0], attributes))
+        self.logger.debug("group_modify current attribute values = %s - new attribute values = %s"
+                          % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
     def user_modify(self, cn, attributes):
@@ -337,7 +344,8 @@ class LdapQuery:
         if current is None:
             self.logger.error("user_modify did not find user with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchUserError(cn)
-        self.logger.debug("user_modify current attribute values = %s - new attribute values = %s" % (current[0], attributes))
+        self.logger.debug("user_modify current attribute values = %s - new attribute values = %s"
+                          % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
     def project_modify(self, cn, attributes):
@@ -353,7 +361,8 @@ class LdapQuery:
         if current is None:
             self.logger.error("project_modify did not find project with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchProjectError(cn)
-        self.logger.debug("project_modify current attribute values = %s - new attribute values = %s" % (current[0], attributes))
+        self.logger.debug("project_modify current attribute values = %s - new attribute values = %s"
+                          % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
     def user_add(self, cn, attributes):
@@ -444,13 +453,15 @@ class LdapQuery:
                 for x in schema.attribute_types([ldap_obj_class_name_or_oid]):
                     attributes.update(x)
             except:
-                self.log.exception("Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s" % (schematype, ldap_obj_class_name_or_oid))
+                self.log.exception("Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s"
+                                   % (schematype, ldap_obj_class_name_or_oid))
                 raise
         else:
             self.log.error('Unknown returned schematype %s' % schematype)
 
         if len(attributes) == 0:
-            self.log.error("No attributes from schematype %s and ldap_obj_class_name_or_oid %s" % (schematype, ldap_obj_class_name_or_oid))
+            self.log.error("No attributes from schematype %s and ldap_obj_class_name_or_oid %s"
+                           % (schematype, ldap_obj_class_name_or_oid))
             return
 
         for attr in attributes.values():
@@ -458,7 +469,8 @@ class LdapQuery:
             single = attr.single_value == 1
             if len(attr.names) > 1:
                 # what with multiple names?
-                self.log.error("Multiple names associated with attr, only using first one. From %s: oid %s names %s" % (ldap_obj_class_name_or_oid, oid, attr.names))
+                self.log.error("Multiple names associated with attr, only using first one. From %s: oid %s names %s"
+                               % (ldap_obj_class_name_or_oid, oid, attr.names))
             name = attr.names[0]
 
             if single:
@@ -499,10 +511,7 @@ class LdapEntity(object):
         itseld. Otherwise, we never end up here.
 
         @returns: the value corresponding to the 'name' atrribute in LDAP
-
-        @raise: FIXME
         """
-        #self.logger.info("Access to %s member ... looking up info in the HPC LDAP for user with id %s" % (name, self.vsc_user_id))
 
         try:
             new_ldap_info = object.__getattribute__(self, 'ldap_info')
@@ -520,13 +529,13 @@ class LdapEntity(object):
     def __setattr__(self, name, value):
         """Setter for the LdapUser fields. Makes the change persistent in the LDAP database.
 
-        @type name: name of the field and the corresponding attribute in the LDAP database for an entry in the ou=people subtree
+        @type name: name of the field and the corresponding attribute in the LDAP database for an entry in the ou=people
+                    subtree
         @type value: the value to store. This will be turned into a list on the fly for non-multivalued LDAP attributes
 
-        @raise: LDAPError if the change cannot be made persistent. In that case, the instance field will not be changed either.
+        @raise: LDAPError if the change cannot be made persistent. In that case, the instance field will not be changed
+                either.
         """
-        #self.logger.info("Access to %s member with value %s ... making persistent in the HPC LDAP for user with id %s" % (name, value, self.vsc_user_id))
-
         try:
             ldap_info = object.__getattribute__(self, 'ldap_info')
             if ldap_info and name in ldap_info:
@@ -537,7 +546,8 @@ class LdapEntity(object):
                     self.modify_ldap({name: ldap_value})
                     self.ldap_info[name] = value
                 except ldap.LDAPError, _:
-                    self.logger.error("Could not save the new value %s for %s with cn=%s to the HPC LDAP" % (value, name, self.vsc_user_id))
+                    self.logger.error("Could not save the new value %s for %s with cn=%s to the HPC LDAP"
+                                      % (value, name, self.vsc_user_id))
                     pass
             else:
                 object.__setattr__(self, name, value)
