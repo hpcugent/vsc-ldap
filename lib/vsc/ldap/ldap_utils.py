@@ -242,3 +242,28 @@ class LdapConnection(object):
         except ldap.LDAPError, err:
             self.log.error("Ldap add failed: dn %s, changes %s [%s]", (dn, changes, err))
             raise
+
+
+def convertTimestamp(timestamp=None):
+    """Convert a timestamp, yielding a string and a datetime.datetime instance.
+
+    @type timestamp: either a string or a datetime.datetime instance. Default value is None, in which case the
+                     local time is returned.
+
+    @returns: tuple with the timestamp as a
+                - LDAP formatted timestamp on GMT in the yyyymmddhhmmssZ format
+                - A datetime.datetime instance representing the timestamp
+    """
+    if timestamp is None:
+        timestamp = datetime.datetime.today()
+
+    if isinstance(timestamp, datetime.datetime):
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=Local)
+        return (timestamp, timestamp.astimezone(utc).strftime(LDAP_DATETIME_TIMEFORMAT))
+
+    elif isinstance(timestamp, str):
+        tmp = datetime.datetime.strptime(timestamp, LDAP_DATETIME_TIMEFORMAT)
+        return (tmp.replace(tzinfo=utc).astimezone(Local), timestamp)
+
+
