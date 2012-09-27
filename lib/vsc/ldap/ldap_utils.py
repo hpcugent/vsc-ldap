@@ -157,7 +157,8 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.search_s(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes)
         except ldap.LDAPError, err:
-            self.log.error("Ldap sync search failed: base %s, ldap_filter %s, attributes %s: %s" % (base, ldap_filter, attributes, err))
+            self.log.error("Ldap sync search failed: base %s, ldap_filter %s, attributes %s: %s"
+                           % (base, ldap_filter, attributes, err))
             raise
 
         return res
@@ -181,7 +182,8 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.search_st(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes, attrs_only, timeout)
         except ldap.LDAPError, err:
-            self.log.error("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s: %s" % (base, ldap_filter, attributes, err))
+            self.log.error("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s: %s"
+                           % (base, ldap_filter, attributes, err))
             raise
 
         return res

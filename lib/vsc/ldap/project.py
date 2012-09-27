@@ -73,7 +73,8 @@ class LdapProject(LdapEntity):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
         project_ldap_info = self.ldap_query.project_filter_search("cn=%s" % (self.project_id))
         if len(project_ldap_info) == 0:
-            self.logger.error("Could not find a project in the LDAP with the ID %s, raising NoSuchGroupError" % (self.project_id))
+            self.logger.error("Could not find a project in the LDAP with the ID %s, raising NoSuchGroupError"
+                              % (self.project_id))
             raise NoSuchProjectError(self.project_id)
 
         return project_ldap_info[0]  # there can be only one
@@ -103,7 +104,8 @@ class LdapProject(LdapEntity):
         projects for the given user.
         """
 
-        projects_info = user.ldap_query.projects_filter_search("memberUid=%s" % user.user_id)  # get all the projects in the LDAP
+        # get all the projects in the LDAP
+        projects_info = user.ldap_query.projects_filter_search("memberUid=%s" % user.user_id)
 
         projects = []
         for p_info in projects_info:

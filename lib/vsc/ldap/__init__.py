@@ -24,6 +24,10 @@ Provides:
 - Errors raised by the VSC LDAP package
 """
 
+#the vsc.ldap namespace is used in different folders allong the system
+#so explicitly declare this is also the vsc namespace
+import pkg_resources
+pkg_resources.declare_namespace(__name__)
 
 class NoSuchUserError(Exception):
     """If a user cannot be found in the LDAP."""
