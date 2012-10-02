@@ -32,7 +32,7 @@ from vsc.ldap.filter import LdapFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
 from vsc.utils.patterns import Singleton
 
-log = fancyLogger.getLogger(name='vsc.ldap.utils')
+log = fancylogger.getLogger(name='vsc.ldap.utils')
 
 
 class SchemaConfiguration(LdapConfiguration):
