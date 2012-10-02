@@ -32,6 +32,8 @@ from vsc.ldap.filter import LdapFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
 from vsc.utils.patterns import Singleton
 
+log = fancyLogger.getLogger(name='vsc.ldap.utils')
+
 
 class SchemaConfiguration(LdapConfiguration):
     """Represents an LDAP configuration with some extra schema-related information."""
@@ -400,35 +402,6 @@ class LdapQuery:
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
         self.ldap.add(dn, attributes.items())
 
-    def read_timestamp(self):
-        """Read the stored timestamp value from a pickled file.
-
-        @returns: string representing a timestamp in the proper LDAP time format
-
-        """
-        timestamp = self.timestamp.read()
-
-        if not timestamp is None and timestamp.tzinfo is None:
-            # add local timezoneinfo
-            timestamp = timestamp.replace(tzinfo=Local)
-
-        return timestamp
-
-    def write_timestamp(self, timestamp):
-        """Write the given timestamp to a pickled file.
-
-        @type timestamp: datetime.datetime timestamp
-        """
-
-        if timestamp.tzinfo is None:
-            # add local timezoneinfo
-            timestamp = timestamp.replace(tzinfo=Local)
-
-        try:
-            self.timestamp.write(timestamp)
-        except Exception, _:
-            raise
-
     def get_schema(self, ldap_obj_class_name_or_oid):
         """Get attributes as provided by schema
         @type ldap_obj_class_name_or_oid: LDAP class name or OID to get the schema from
@@ -555,6 +528,34 @@ class LdapEntity(object):
             # in this case, insufficient initialisation, and we simply set the
             # values directly
             object.__setattr__(self, name, value)
+
+
+def read_timestamp(timestamp_pickle):
+    """Read the stored timestamp value from a pickled file.
+
+    @returns: string representing a timestamp in the proper LDAP time format
+
+    """
+    timestamp = timestamp_pickle.read()
+
+    if not timestamp is None and timestamp.tzinfo is None:
+        # add local timezoneinfo
+        timestamp = timestamp.replace(tzinfo=Local)
+
+    return timestamp
+
+
+def write_timestamp(timestamp_pickle):
+    """Write the given timestamp to a pickled file.
+
+    @type timestamp: datetime.datetime timestamp
+    """
+
+    if timestamp.tzinfo is None:
+        # add local timezoneinfo
+        timestamp = timestamp.replace(tzinfo=Local)
+
+    timestamp_pickle.write(timestamp)
 
 
 if __name__ == '__main__':
