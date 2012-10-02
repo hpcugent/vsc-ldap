@@ -166,8 +166,8 @@ class LdapUser(LdapEntity):
 
         @returns: list of LdapUser instances that match the given filter criteria
         """
-        ldap_query = LdapQuery().get()
+        ldap_query = LdapQuery()  # This should have been initialised earlier/elsewhere!
 
         users = ldap_query.user_filter_search(ldap_filter, attributes=['cn'])
 
-        return [cls(u['cn']) for u in users and 'cn' in u]
+        return [cls(u['cn']) for u in users if 'cn' in u]
