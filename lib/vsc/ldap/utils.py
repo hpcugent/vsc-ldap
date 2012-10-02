@@ -545,7 +545,7 @@ def read_timestamp(timestamp_pickle):
     return timestamp
 
 
-def write_timestamp(timestamp_pickle):
+def write_timestamp(timestamp_pickle, timestamp):
     """Write the given timestamp to a pickled file.
 
     @type timestamp: datetime.datetime timestamp
