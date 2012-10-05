@@ -164,7 +164,7 @@ class LdapUser(LdapEntity):
 
         @ldap_filter: LdapFilter instance or string describing such a filter.
 
-        @returns: list of LdapUser instances that match the given filter criteria
+        @returns: list of cls instances that match the given filter criteria
         """
         ldap_query = LdapQuery()  # This should have been initialised earlier/elsewhere!
 
