@@ -30,7 +30,7 @@ as all machines where we might require LDAP accesss.
 
 # --------------------------------------------------------------------
 from vsc.ldap import NoSuchGroupError
-from vsc.ldap.utils import LdapEntity
+from vsc.ldap.utils import LdapEntity, LdapQuery
 
 
 class LdapGroup(LdapEntity):
@@ -86,3 +86,17 @@ class LdapGroup(LdapEntity):
 
         self.ldap_query.group_add(self.group_id, ldap_attributes)
         self.ldap_info = ldap_attributes
+
+    @classmethod
+    def lookup(cls, ldap_filter):
+        """Lookup groups that match some filter criterium. Note that this will reaquire a second access later on.
+
+        @ldap_filter: LdapFilter instance or string describing such a filter.
+
+        @returns: list of cls instances that match the given filter criteria
+        """
+        ldap_query = LdapQuery()  # This should have been initialised earlier/elsewhere!
+
+        groups = ldap_query.group_filter_search(ldap_filter, attributes=['cn'])
+
+        return [cls(g['cn']) for g in groups if 'cn' in g]
