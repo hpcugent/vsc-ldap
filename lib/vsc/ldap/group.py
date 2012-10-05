@@ -72,6 +72,13 @@ class LdapGroup(LdapEntity):
 
         return group_ldap_info[0]  # there can be only one
 
+    def modify_ldap(self, attributes):
+        """Overiding the LdapEntity function.
+
+        @type attributes: dictionary with the LDAP attributes.
+        """
+        self.ldap_query.group_modify(self.group_id, attributes)
+
     def add(self, ldap_attributes):
         """Adds a new group to the HPC LDAP.
 
