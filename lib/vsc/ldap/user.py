@@ -158,16 +158,16 @@ class LdapUser(LdapEntity):
         self.ldap_query.user_add(self.user_id, ldap_attributes)
         self.ldap_info = ldap_attributes
 
-    @staticmethod
-    def lookup(ldap_filter):
+    @classmethod
+    def lookup(cls, ldap_filter):
         """Lookup users that match some filter criterium. Note that this will reaquire a second access later on.
 
         @ldap_filter: LdapFilter instance or string describing such a filter.
 
-        @returns: list of LdapUser instances that match the given filter criteria
+        @returns: list of cls instances that match the given filter criteria
         """
-        ldap_query = LdapQuery().get()
+        ldap_query = LdapQuery()  # This should have been initialised earlier/elsewhere!
 
         users = ldap_query.user_filter_search(ldap_filter, attributes=['cn'])
 
-        return [LdapUser(u['cn']) for u in users and 'cn' in u]
+        return [cls(u['cn']) for u in users if 'cn' in u]

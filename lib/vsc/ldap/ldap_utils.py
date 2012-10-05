@@ -24,12 +24,16 @@ Low-level LDAP tools, wrapping the python-ldap functions.
 
 For third party docs, see http://www.python-ldap.org/docs.shtml
 """
+import datetime
 import ldap
 import ldap.schema
 
 from ldapurl import LDAPUrl
 
 import vsc.fancylogger as fancylogger
+from vsc.dateandtime import Local, utc
+
+LDAP_DATETIME_TIMEFORMAT = "%Y%m%d%H%M%SZ"
 
 logger = fancylogger.getLogger(name=__name__)
 
