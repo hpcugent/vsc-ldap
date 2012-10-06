@@ -35,8 +35,6 @@ from vsc.ldap.filter import LdapFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
 from vsc.utils.patterns import Singleton
 
-log = fancylogger.getLogger(name='vsc.ldap.utils')
-
 
 class SchemaConfiguration(LdapConfiguration):
     """Represents an LDAP configuration with some extra schema-related information."""
