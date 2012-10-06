@@ -418,9 +418,8 @@ class LdapQuery:
         try:
             # returns ('cn=Subschema', <ldap.schema.subentry.SubSchema instance at 0x1986878>)
             schematype, schema = ldap.schema.subentry.urlfetch(self.ldapurl.unparse())
-        except Exception, _:
-            self.log.exception("Failed to fetch schema from url")
-            raise
+        except Exception, err:
+            self.log.raiseException("Failed to fetch schema from url", err)
 
         attributes = {}
         if schematype == 'cn=Subschema':
@@ -428,10 +427,9 @@ class LdapQuery:
                 # this returns a list of dicts
                 for x in schema.attribute_types([ldap_obj_class_name_or_oid]):
                     attributes.update(x)
-            except:
-                self.log.exception("Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s"
-                                   % (schematype, ldap_obj_class_name_or_oid))
-                raise
+            except Exception, err:
+                self.log.raiseException("Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s"
+                                   % (schematype, ldap_obj_class_name_or_oid), err)
         else:
             self.log.error('Unknown returned schematype %s' % schematype)
 
@@ -494,8 +492,8 @@ class LdapEntity(object):
             if new_ldap_info is None:
                 new_ldap_info = self.get_ldap_info()
                 object.__setattr__(self, 'ldap_info', new_ldap_info)
-        except AttributeError, _:
-            raise
+        except AttributeError, err:
+            self.log.raiseException("Tried to access an unknown attribute %s" % (name), err)
 
         if new_ldap_info and name in new_ldap_info:
             return new_ldap_info[name]
