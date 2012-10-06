@@ -69,7 +69,7 @@ class LdapVo(LdapEntity):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
         vo_ldap_info = self.ldap_query.vo_filter_search("cn=%s" % (self.vo_id))
         if len(vo_ldap_info) == 0:
-            self.logger.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError"
+            self.log.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError"
                               % (self.vo_id))
             raise NoSuchVoError(self.vo_id)
 

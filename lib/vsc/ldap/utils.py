@@ -72,7 +72,7 @@ class LdapQuery:
         If you initialise using None as the configuration, this will not fail
         if the singleton has already been created.
         """
-        self.logger = fancylogger.getLogger(name=self.__class__.__name__)
+        self.log = fancylogger.getLogger(name=self.__class__.__name__)
         self.configuration = configuration
         self.ldap = LdapConnection(configuration)
 
@@ -91,19 +91,19 @@ class LdapQuery:
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
         if not self.ldap:
-            self.logger.error("LDAP search request (group_filter_search) failed: ldap not initialised")
+            self.log.error("LDAP search request (group_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
         if isinstance(filter, LdapFilter):
             filter = str(filter)
 
         # for groups, we use the following base
-        self.logger.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.group_dn_base
         entries = self.ldap.search(filter, base, attributes)
         results = [self.__delist_ldap_return_value(e, self.configuration.group_multi_value_attributes, attributes)
                    for e in entries]
-        self.logger.debug("group_filter_search finds %d results" % (len(results)))
+        self.log.debug("group_filter_search finds %d results" % (len(results)))
         return results
 
     def group_search(self, cn, member_uid, attributes=None):
@@ -116,14 +116,14 @@ class LdapQuery:
 
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
-        self.logger.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
+        self.log.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
                          % (cn, member_uid, attributes))
         result = self.group_filter_search("(&(cn=%s) (memberUid=%s))" % (cn, member_uid), attributes)
-        self.logger.debug("group_search for %s, %s yields %s" % (cn, member_uid, result))
+        self.log.debug("group_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
             return result[0]
         else:
-            self.logger.debug("group_search returning None")
+            self.log.debug("group_search returning None")
             return None
 
     def vo_filter_search(self, filter, attributes=None):
@@ -139,17 +139,17 @@ class LdapQuery:
         if isinstance(filter, LdapFilter):
             filter = str(filter)
 
-        self.logger.info("vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.info("vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         if attributes and not 'cn' in attributes:
             attributes.append('cn')
         results = self.group_filter_search(filter, attributes)
         if not results is None:
             vo_name_regex = re.compile(r"^(a|b|g|l|v)vo\d{5}$")
             results = [r for r in results if len(r) > 0 and vo_name_regex.search(r['cn'])]
-            self.logger.debug("vo_filter_search retains %d results after applying VO filter" % (len(results)))
+            self.log.debug("vo_filter_search retains %d results after applying VO filter" % (len(results)))
             return results
         else:
-            self.logger.debug("vo_filter_search returning None")
+            self.log.debug("vo_filter_search returning None")
             return []
 
     def no_vo_filter_search(self, filter, attributes=None):
@@ -165,17 +165,17 @@ class LdapQuery:
         if isinstance(filter, LdapFilter):
             filter = str(filter)
 
-        self.logger.info("no_vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.info("no_vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         if attributes and not 'cn' in attributes:
             attributes.append('cn')
         results = self.group_filter_search(filter, attributes)
         if not results is None:
             vo_name_regex = re.compile(r"^(a|b|g|l|v)vo\d{5}$")
             results = [r for r in results if not vo_name_regex.search(r['cn'])]
-            self.logger.debug("no_vo_filter_search retains %d results after applying VO filter" % (len(results)))
+            self.log.debug("no_vo_filter_search retains %d results after applying VO filter" % (len(results)))
             return results
         else:
-            self.logger.debug("no_vo_filter_search returning None")
+            self.log.debug("no_vo_filter_search returning None")
             return []
 
     def vo_search(self, cn, member_uid, attributes=None):
@@ -188,11 +188,11 @@ class LdapQuery:
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
         result = self.vo_filter_search("(&(cn=%s) (memberUid=%s))" % (cn, member_uid), attributes)
-        self.logger.debug("vo_search for %s, %s yields %s" % (cn, member_uid, result))
+        self.log.debug("vo_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
             return result[0]
         else:
-            self.logger.debug("vo_search returning None")
+            self.log.debug("vo_search returning None")
             return None
 
     def no_vo_search(self, cn, member_uid, attributes=None):
@@ -206,11 +206,11 @@ class LdapQuery:
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
         result = self.no_vo_filter_search("(&(cn=%s) (memberUid=%s))" % (cn, member_uid), attributes)
-        self.logger.debug("no_vo_search for %s, %s yields %s" % (cn, member_uid, result))
+        self.log.debug("no_vo_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
             return result[0]
         else:
-            self.logger.debug("no_vo_search returning None")
+            self.log.debug("no_vo_search returning None")
             return None
 
     def project_filter_search(self, filter, attributes=None):
@@ -225,18 +225,18 @@ class LdapQuery:
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
         if not self.ldap:
-            self.logger.error("LDAP search request (user_filter_search) failed: ldap not initialised")
+            self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
         if isinstance(filter, LdapFilter):
             filter = str(filter)
 
-        self.logger.info("project_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.info("project_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.project_dn_base
         entries = self.ldap.search(filter, base, attributes)
         results = [self.__delist_ldap_return_value(e, self.configuration.project_multi_value_attributes, attributes)
                    for e in entries]
-        self.logger.debug("project_filter_search finds %d results" % (len(results)))
+        self.log.debug("project_filter_search finds %d results" % (len(results)))
         return results
 
     def user_filter_search(self, filter, attributes=None):
@@ -251,19 +251,19 @@ class LdapQuery:
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
         if not self.ldap:
-            self.logger.error("LDAP search request (user_filter_search) failed: ldap not initialised")
+            self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
         if isinstance(filter, LdapFilter):
             filter = str(filter)
 
         # For users, we use the following base:
-        self.logger.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.user_dn_base
         entries = self.ldap.search(filter, base, attributes)
         results = [self.__delist_ldap_return_value(e, self.configuration.user_multi_value_attributes, attributes)
                    for e in entries]
-        self.logger.debug("user_filter_search finds %d results" % (len(results)))
+        self.log.debug("user_filter_search finds %d results" % (len(results)))
         return results
 
     def user_search(self, user_id, institute, attributes=None):
@@ -280,11 +280,11 @@ class LdapQuery:
         @returns: a dictionary, with the values for the requested attributes for the given user
         """
         result = self.user_filter_search("(&(instituteLogin=%s) (institute=%s))" % (user_id, institute), attributes)
-        self.logger.debug("user_search for %s, %s yields %s" % (user_id, institute, result))
+        self.log.debug("user_search for %s, %s yields %s" % (user_id, institute, result))
         if not result is None and len(result) > 0:
             return result[0]
         else:
-            self.logger.debug("user_search returning None")
+            self.log.debug("user_search returning None")
             return None
 
     def __delist_ldap_return_value(self, entry, list_attributes=None, attributes=None):
@@ -328,9 +328,9 @@ class LdapQuery:
         dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
         current = self.group_filter_search("(cn=%s)" % (cn))
         if current is None:
-            self.logger.error("group_modify did not find group with cn = %s (dn = %s)" % (cn, dn))
+            self.log.error("group_modify did not find group with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchGroupError(cn)
-        self.logger.debug("group_modify current attribute values = %s - new attribute values = %s"
+        self.log.debug("group_modify current attribute values = %s - new attribute values = %s"
                           % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
@@ -345,9 +345,9 @@ class LdapQuery:
         dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
         current = self.user_filter_search("(cn=%s)" % (cn))
         if current is None:
-            self.logger.error("user_modify did not find user with cn = %s (dn = %s)" % (cn, dn))
+            self.log.error("user_modify did not find user with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchUserError(cn)
-        self.logger.debug("user_modify current attribute values = %s - new attribute values = %s"
+        self.log.debug("user_modify current attribute values = %s - new attribute values = %s"
                           % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
@@ -362,9 +362,9 @@ class LdapQuery:
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
         current = self.project_filter_search("(cn=%s)" % (cn))
         if current is None:
-            self.logger.error("project_modify did not find project with cn = %s (dn = %s)" % (cn, dn))
+            self.log.error("project_modify did not find project with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchProjectError(cn)
-        self.logger.debug("project_modify current attribute values = %s - new attribute values = %s"
+        self.log.debug("project_modify current attribute values = %s - new attribute values = %s"
                           % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
@@ -463,7 +463,7 @@ class LdapEntity(object):
         """
         self.ldap_query = LdapQuery(None)
         self.ldap_info = None
-        self.logger = fancylogger.getLogger(self.__class__.__name__)
+        self.log = fancylogger.getLogger(self.__class__.__name__)
 
     def get_ldap_info(self):
         pass
@@ -518,7 +518,7 @@ class LdapEntity(object):
                     self.modify_ldap({name: ldap_value})
                     self.ldap_info[name] = value
                 except ldap.LDAPError, _:
-                    self.logger.error("Could not save the new value %s for %s with cn=%s to the LDAP"
+                    self.log.error("Could not save the new value %s for %s with cn=%s to the LDAP"
                                       % (value, name, self.vsc_user_id))
                     pass
             else:
