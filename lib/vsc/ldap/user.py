@@ -41,7 +41,7 @@ from vsc.ldap.vo import LdapVo
 
 
 class LdapUser(LdapEntity):
-    """Representing a user in the HPC LDAP database.
+    """Representing a user in the VSC LDAP database.
 
     Requires initialisation using a unique identification.
 
@@ -76,11 +76,11 @@ class LdapUser(LdapEntity):
         self.projects = None  # projects the user participates in
 
     def get_ldap_info(self):
-        """Retrieve the data from the HPC LDAP to initially fill up the ldap_info field.
+        """Retrieve the data from the LDAP to initially fill up the ldap_info field.
         """
         user_ldap_info = self.ldap_query.user_filter_search(filter="cn=%s" % (self.user_id))
         if len(user_ldap_info) == 0:
-            self.logger.error("Could not find a user in the HPC LDAP with the ID %s, raising NoSuchUserError"
+            self.logger.error("Could not find a user in the LDAP with the ID %s, raising NoSuchUserError"
                               % (self.user_id))
             raise NoSuchUserError(name=self.user_id)
 
@@ -147,7 +147,7 @@ class LdapUser(LdapEntity):
         return self.projects
 
     def add(self, ldap_attributes):
-        """Adds a new user to the HPC LDAP.
+        """Adds a new user to the LDAP.
 
         Does two things:
             - effectively inserts the data into the LDAP database

@@ -22,7 +22,7 @@
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 ##
 """
-High-level tools for interacting with the HPC LDAP for groups.
+High-level tools for interacting with the VSC LDAP for groups.
 
 The LdapGroup class will bind to the LDAP server using LdapQuery, so
 there is no need to do this manually.
@@ -37,7 +37,7 @@ from vsc.ldap.utils import LdapEntity, LdapQuery
 
 
 class LdapGroup(LdapEntity):
-    """Representing a group in the HPC LDAP database.
+    """Representing a group in the LDAP database.
 
     Requires initialisation using a unique identification.
 
@@ -83,7 +83,7 @@ class LdapGroup(LdapEntity):
         self.ldap_query.group_modify(self.group_id, attributes)
 
     def add(self, ldap_attributes):
-        """Adds a new group to the HPC LDAP.
+        """Adds a new group to the LDAP.
 
         Does two things:
             - effectively inserts the data into the LDAP database

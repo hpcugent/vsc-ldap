@@ -22,7 +22,7 @@
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 ##
 """
-High-level tools for interacting with the HPC LDAP for projects
+High-level tools for interacting with the VSC LDAP for projects
 
 The LdapProject class will bind to the LDAP server using LdapQuery, so
 there is no need to do this manually.
@@ -39,7 +39,7 @@ from vsc.ldap.utils import LdapEntity
 
 
 class LdapProject(LdapEntity):
-    """Representing a project in the HPC LDAP database.
+    """Representing a project in the LDAP database.
 
     Requires initialisation using a unique identification.
 
@@ -83,7 +83,7 @@ class LdapProject(LdapEntity):
         return project_ldap_info[0]  # there can be only one
 
     def add(self, ldap_attributes):
-        """Adds a new project to the HPC LDAP.
+        """Adds a new project to the LDAP.
 
         Does two things:
             - effectively inserts the data into the LDAP database

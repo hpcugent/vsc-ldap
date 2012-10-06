@@ -522,7 +522,7 @@ class LdapEntity(object):
                     self.modify_ldap({name: ldap_value})
                     self.ldap_info[name] = value
                 except ldap.LDAPError, _:
-                    self.logger.error("Could not save the new value %s for %s with cn=%s to the HPC LDAP"
+                    self.logger.error("Could not save the new value %s for %s with cn=%s to the LDAP"
                                       % (value, name, self.vsc_user_id))
                     pass
             else:
