@@ -118,7 +118,9 @@ class LdapQuery:
         """
         self.log.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
                          % (cn, member_uid, attributes))
-        result = self.group_filter_search("(&(cn=%s) (memberUid=%s))" % (cn, member_uid), attributes)
+        cn_filter = LdapFilter("cn=%s" % cn)
+        member_filter = LdapFilter("memberUid=%s" % member_uid)
+        result = self.group_filter_search(cn_filter & member_filter, attributes)
         self.log.debug("group_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
             return result[0]
@@ -187,7 +189,9 @@ class LdapQuery:
                           None (default), we return all the retrieved attributes
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
-        result = self.vo_filter_search("(&(cn=%s) (memberUid=%s))" % (cn, member_uid), attributes)
+        cn_filter = LdapFilter("cn=%s" % cn)
+        member_filter = LdapFilter("memberUid=%s" % member_uid)
+        result = self.vo_filter_search(cn_filter & member_filter, attributes)
         self.log.debug("vo_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
             return result[0]
@@ -205,7 +209,9 @@ class LdapQuery:
 
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
-        result = self.no_vo_filter_search("(&(cn=%s) (memberUid=%s))" % (cn, member_uid), attributes)
+        cn_filter = LdapFilter("cn=%s" % cn)
+        member_filter = LdapFilter("memberUid=%s" % member_uid)
+        result = self.no_vo_filter_search(cn_filter & member_filter, attributes)
         self.log.debug("no_vo_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
             return result[0]
