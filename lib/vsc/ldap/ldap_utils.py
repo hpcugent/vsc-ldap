@@ -201,8 +201,8 @@ class LdapConnection(object):
         if self.ldap_connection is None:
             self.bind()
 
+        mod_attrs = [(ldap.MOD_REPLACE, attribute, value)]
         try:
-            mod_attrs = [(ldap.MOD_REPLACE, attribute, value)]
             self.ldap_connection.modify_s(dn, mod_attrs)
         except ldap.LDAPError, err:
             self.log.raiseException("Ldap update failed: dn %s, attribute %s, value %s: %s" % (dn, attribute, value), err)
@@ -233,10 +233,11 @@ class LdapConnection(object):
         if self.ldap_connection is None:
             self.bind()
 
+        changes = [(k, [v]) for (k, v) in attributes if not type(v) == list]
+        changes.extend([(k, v) for (k, v) in attributes if type(v) == list])
+        self.log.info("Adding for dn=%s with changes = %s" % (dn, changes))
+
         try:
-            changes = [(k, [v]) for (k, v) in attributes if not type(v) == list]
-            changes.extend([(k, v) for (k, v) in attributes if type(v) == list])
-            self.log.info("Adding for dn=%s with changes = %s" % (dn, changes))
             self.ldap_connection.add_s(dn, changes)
         except ldap.LDAPError, err:
             self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]", (dn, changes), err)
