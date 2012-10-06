@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 ##
-"""Convenience classes for using the VSC LDAP.
+"""Convenience classes for using the LDAP.
 """
 import ldap
 import ldap.modlist

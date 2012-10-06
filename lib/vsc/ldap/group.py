@@ -22,7 +22,7 @@
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 ##
 """
-High-level tools for interacting with the VSC LDAP for groups.
+High-level tools for interacting with the LDAP for groups.
 
 The LdapGroup class will bind to the LDAP server using LdapQuery, so
 there is no need to do this manually.
