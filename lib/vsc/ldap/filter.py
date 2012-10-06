@@ -74,6 +74,10 @@ import copy
 from vsc.ldap.ldap_utils import convertTimestamp
 
 
+class LdapFilterError(Exception):
+    pass
+
+
 class LdapFilter(object):
     """Representing an LDAP filter with operators between the filter values.
 
@@ -109,8 +113,7 @@ class LdapFilter(object):
                 initialiser = ls[0]
             return reduce(lambda x, y: operator(x, y), ls[1:], initialiser)
         else:
-            # FIXME: not sure what should be returned here
-            return LdapFilter("")
+            raise LdapFilterError()
 
     def __and__(self, value):
         """Return a new filter that is the logical and operator of this filter and the provided value.
@@ -209,6 +212,8 @@ class TimestampFilter(LdapFilter):
         """
         super(TimestampFilter, self).__init__(value)
         self.timestamp = convertTimestamp(timestamp)[1]
+        if comparator != '>=' and comparator != '<=':
+            raise LdapFilterError()
         self.comparator = comparator
 
     def __str__(self):
