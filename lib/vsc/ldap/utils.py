@@ -557,7 +557,3 @@ def write_timestamp(timestamp_pickle, timestamp):
         timestamp = timestamp.replace(tzinfo=Local)
 
     timestamp_pickle.write(timestamp)
-
-
-if __name__ == '__main__':
-    pass
