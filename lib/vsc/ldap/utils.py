@@ -138,9 +138,6 @@ class LdapQuery:
 
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
-        if isinstance(filter, LdapFilter):
-            filter = str(filter)
-
         self.log.info("vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         if attributes and not 'cn' in attributes:
             attributes.append('cn')
@@ -164,9 +161,6 @@ class LdapQuery:
 
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
-        if isinstance(filter, LdapFilter):
-            filter = str(filter)
-
         self.log.info("no_vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         if attributes and not 'cn' in attributes:
             attributes.append('cn')
@@ -264,7 +258,7 @@ class LdapQuery:
             filter = str(filter)
 
         # For users, we use the following base:
-        self.log.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.info("user_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.user_dn_base
         entries = self.ldap.search(filter, base, attributes)
         results = [self.__delist_ldap_return_value(e, self.configuration.user_multi_value_attributes, attributes)
@@ -285,7 +279,10 @@ class LdapQuery:
 
         @returns: a dictionary, with the values for the requested attributes for the given user
         """
-        result = self.user_filter_search("(&(instituteLogin=%s) (institute=%s))" % (user_id, institute), attributes)
+        login_filter = LdapFilter("instituteLogin=%s" % (user_id))
+        institute_filter = LdapFilter("institute=%s" % (institute))
+
+        result = self.user_filter_search(login_filter & institute_filter, attributes)
         self.log.debug("user_search for %s, %s yields %s" % (user_id, institute, result))
         if not result is None and len(result) > 0:
             return result[0]
