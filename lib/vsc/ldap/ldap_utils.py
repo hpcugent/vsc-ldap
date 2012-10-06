@@ -38,8 +38,6 @@ from vsc.dateandtime import Local, utc
 
 LDAP_DATETIME_TIMEFORMAT = "%Y%m%d%H%M%SZ"
 
-logger = fancylogger.getLogger(name=__name__)
-
 
 class LdapConfiguration(object):
     """Represents some LDAP configuration.
@@ -264,5 +262,3 @@ def convertTimestamp(timestamp=None):
     elif isinstance(timestamp, str):
         tmp = datetime.datetime.strptime(timestamp, LDAP_DATETIME_TIMEFORMAT)
         return (tmp.replace(tzinfo=utc).astimezone(Local), timestamp)
-
-
