@@ -245,3 +245,10 @@ class OlderThanFilter(TimestampFilter):
                          will be converted to a format LDAP groks.
         """
         super(OlderThanFilter, self).__init__(value, timestamp, '<=')
+
+
+class CnFilter(LdapFilter):
+    """Representa a filter that matches a given common name."""
+
+    def __init__(self, cn):
+        super(CnFilter, self).__init__("cn=%s" % cn)
