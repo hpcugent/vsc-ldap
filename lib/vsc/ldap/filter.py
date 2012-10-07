@@ -251,4 +251,11 @@ class CnFilter(LdapFilter):
     """Representa a filter that matches a given common name."""
 
     def __init__(self, cn):
-        super(CnFilter, self).__init__("cn=%s" % cn)
+        super(CnFilter, self).__init__("cn=%s" % (cn))
+
+
+class MemberFilter(LdapFilter):
+    """Represents a filter that looks if a member is listed in the memberUid."""
+
+    def __init__(self, user_id):
+        super(MemberFilter, self).__init__("memberUid=%s" % (user_id))
