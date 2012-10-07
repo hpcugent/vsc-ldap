@@ -329,7 +329,7 @@ class LdapQuery:
         @raise: NoSuchGroupError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
-        current = self.group_filter_search("(cn=%s)" % (cn))
+        current = self.group_filter_search(CnFilter(cn))
         if current is None:
             self.log.error("group_modify did not find group with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchGroupError(cn)
@@ -346,7 +346,7 @@ class LdapQuery:
         @raise: NoSuchUserError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
-        current = self.user_filter_search("(cn=%s)" % (cn))
+        current = self.user_filter_search(CnFilter(cn))
         if current is None:
             self.log.error("user_modify did not find user with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchUserError(cn)
@@ -363,7 +363,7 @@ class LdapQuery:
         @raise: NoSuchProjectError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
-        current = self.project_filter_search("(cn=%s)" % (cn))
+        current = self.project_filter_search(CnFilter(cn))
         if current is None:
             self.log.error("project_modify did not find project with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchProjectError(cn)
