@@ -34,7 +34,7 @@ as all machines where we might require LDAP accesss.
 # --------------------------------------------------------------------
 import vsc.fancylogger as fancylogger
 from vsc.ldap import NoSuchVoError
-from vsc.ldap.filter import MemberFilter
+from vsc.ldap.filter import CnFilter, MemberFilter
 from vsc.ldap.utils import LdapEntity
 
 _logger = fancylogger.getLogger(__name__)
@@ -71,7 +71,7 @@ class LdapVo(LdapEntity):
 
     def get_ldap_info(self):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
-        vo_ldap_info = self.ldap_query.vo_filter_search("cn=%s" % (self.vo_id))
+        vo_ldap_info = self.ldap_query.vo_filter_search(CnFilter(self.vo_id))
         if len(vo_ldap_info) == 0:
             self.log.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError"
                               % (self.vo_id))
