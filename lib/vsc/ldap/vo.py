@@ -33,6 +33,7 @@ as all machines where we might require LDAP accesss.
 
 # --------------------------------------------------------------------
 from vsc.ldap import NoSuchVoError
+from vsc.ldap.filter import MemberFilter
 from vsc.ldap.utils import LdapEntity
 
 
@@ -100,7 +101,7 @@ class LdapVo(LdapEntity):
                   there is no such VO.
         """
         # gets all the attrributes provided by the LDAP server
-        vos = user.ldap_query.vo_filter_search("memberUid=%s" % user.user_id)
+        vos = user.ldap_query.vo_filter_search(MemberFilter(user.user_id))
 
         if len(vos) == 0:
             return None
