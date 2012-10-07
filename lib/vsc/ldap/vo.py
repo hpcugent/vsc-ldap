@@ -32,9 +32,12 @@ as all machines where we might require LDAP accesss.
 """
 
 # --------------------------------------------------------------------
+import vsc.fancylogger as fancylogger
 from vsc.ldap import NoSuchVoError
 from vsc.ldap.filter import MemberFilter
 from vsc.ldap.utils import LdapEntity
+
+_logger = fancylogger.getLogger(__name__)
 
 
 class LdapVo(LdapEntity):
@@ -108,7 +111,7 @@ class LdapVo(LdapEntity):
 
         # there should be at most a single VO.
         if len(vos) > 1:
-            raise Exception()
+            _logger.raiseException("Found multiple VOs for the given user (%s), vos = %s" % (user, vos), Exception())
 
         vo_info = vos[0]
 
