@@ -94,9 +94,6 @@ class LdapQuery:
             self.log.error("LDAP search request (group_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
-        if isinstance(filter, LdapFilter):
-            filter = str(filter)
-
         # for groups, we use the following base
         self.log.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.group_dn_base
@@ -228,9 +225,6 @@ class LdapQuery:
             self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
-        if isinstance(filter, LdapFilter):
-            filter = str(filter)
-
         self.log.info("project_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         base = self.configuration.project_dn_base
         entries = self.ldap.search(filter, base, attributes)
@@ -253,9 +247,6 @@ class LdapQuery:
         if not self.ldap:
             self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
-
-        if isinstance(filter, LdapFilter):
-            filter = str(filter)
 
         # For users, we use the following base:
         self.log.info("user_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
