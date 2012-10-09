@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 ##
 #
-# Copyright 2010-2012 Stijn De Weirdt
+# Copyright 2012 Stijn De Weirdt
 # Copyright 2012 Andy Georges
 #
-# This file is part of the tools originally by the HPC team of
-# Ghent University (http://ugent.be/hpc).
+# This file is part of VSC-tools,
+# originally created by the HPC team of the University of Ghent (http://ugent.be/hpc).
 #
-# This is free software: you can redistribute it and/or modify
+#
+# http://github.com/hpcugent/VSC-tools
+#
+# VSC-tools is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation v2.
 #
@@ -34,8 +37,6 @@ import vsc.fancylogger as fancylogger
 from vsc.dateandtime import Local, utc
 
 LDAP_DATETIME_TIMEFORMAT = "%Y%m%d%H%M%SZ"
-
-logger = fancylogger.getLogger(name=__name__)
 
 
 class LdapConfiguration(object):
@@ -87,8 +88,7 @@ class LdapConnection(object):
         try:
             self.ldap_connection = ldap.initialize(ldap_url)
         except ldap.LDAPError, err:
-            self.log.error("Failed to connect to the LDAP server at %s: %s" % (ldap_url, err))
-            raise
+            self.log.raiseException("Failed to connect to the LDAP server at %s" % (ldap_url), err)
 
         ## generate ldapurl obj after succesfull connect
         self.ldap_url = LDAPUrl(ldapUrl=ldap_url)
@@ -103,8 +103,7 @@ class LdapConnection(object):
             try:
                 self.connect()
             except ldap.LDAPError, err:
-                self.log.error("Binding to LDAP failed - no connection.")
-                raise
+                self.log.raiseException("Binding to LDAP failed - no connection.", err)
 
         password = self.configuration.password
         dn = self.configuration.connection_dn
@@ -113,8 +112,7 @@ class LdapConnection(object):
             res = self.ldap_connection.simple_bind_s(dn, password)
             self.log.debug("Binding to LDAP with dn %s resulted in %s" % (dn, res))
         except ldap.LDAPError, err:
-            self.log.error("Binding to LDAP failed %s" % (err))
-            raise
+            self.log.raiseException("Binding to LDAP failed", err)
 
         ## update url after succesful bind
         ## WARNING self.ldap_url.unparse() will show the password. don't use it in logging !!
@@ -161,9 +159,8 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.search_s(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes)
         except ldap.LDAPError, err:
-            self.log.error("Ldap sync search failed: base %s, ldap_filter %s, attributes %s: %s"
-                           % (base, ldap_filter, attributes, err))
-            raise
+            self.log.raiseException("Ldap sync search failed: base %s, ldap_filter %s, attributes %s"
+                           % (base, ldap_filter, attributes), err)
 
         return res
 
@@ -186,9 +183,8 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.search_st(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes, attrs_only, timeout)
         except ldap.LDAPError, err:
-            self.log.error("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s: %s"
-                           % (base, ldap_filter, attributes, err))
-            raise
+            self.log.raiseException("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s: %s"
+                           % (base, ldap_filter, attributes), err)
 
         return res
 
@@ -203,12 +199,11 @@ class LdapConnection(object):
         if self.ldap_connection is None:
             self.bind()
 
+        mod_attrs = [(ldap.MOD_REPLACE, attribute, value)]
         try:
-            mod_attrs = [(ldap.MOD_REPLACE, attribute, value)]
             self.ldap_connection.modify_s(dn, mod_attrs)
         except ldap.LDAPError, err:
-            self.log.error("Ldap update failed: dn %s, attribute %s, value %s: %s" % (dn, attribute, value, err))
-            raise
+            self.log.raiseException("Ldap update failed: dn %s, attribute %s, value %s: %s" % (dn, attribute, value), err)
 
     def modify_attributes(self, dn, changes):
         """Modify one or more attributes.
@@ -223,8 +218,7 @@ class LdapConnection(object):
         try:
             self.ldap_connection.modify_s(dn, changes)
         except ldap.LDAPError, err:
-            self.log.error("Ldap update failed: dn %s, changes %s [%s]", (dn, changes, err))
-            raise
+            self.log.raiseException("Ldap update failed: dn %s, changes %s [%s]", (dn, changes), err)
 
     def add(self, dn, attributes):
         """Add an entry for the given distinguished name with the given attributes and their corresponding values.
@@ -237,14 +231,14 @@ class LdapConnection(object):
         if self.ldap_connection is None:
             self.bind()
 
+        changes = [(k, [v]) for (k, v) in attributes if not type(v) == list]
+        changes.extend([(k, v) for (k, v) in attributes if type(v) == list])
+        self.log.info("Adding for dn=%s with changes = %s" % (dn, changes))
+
         try:
-            changes = [(k, [v]) for (k, v) in attributes if not type(v) == list]
-            changes.extend([(k, v) for (k, v) in attributes if type(v) == list])
-            self.log.info("Adding for dn=%s with changes = %s" % (dn, changes))
             self.ldap_connection.add_s(dn, changes)
         except ldap.LDAPError, err:
-            self.log.error("Ldap add failed: dn %s, changes %s [%s]", (dn, changes, err))
-            raise
+            self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]", (dn, changes), err)
 
 
 def convertTimestamp(timestamp=None):
@@ -268,5 +262,3 @@ def convertTimestamp(timestamp=None):
     elif isinstance(timestamp, str):
         tmp = datetime.datetime.strptime(timestamp, LDAP_DATETIME_TIMEFORMAT)
         return (tmp.replace(tzinfo=utc).astimezone(Local), timestamp)
-
-

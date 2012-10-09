@@ -4,11 +4,15 @@
 # Copyright 2012 Stijn De Weirdt
 # Copyright 2012 Andy Georges
 #
-# This file is part of the tools originally by the HPC team of
-# Ghent University (http://ugent.be/hpc).
+# This file is part of VSC-tools,
+# originally created by the HPC team of the University of Ghent (http://ugent.be/hpc).
 #
-# This is free software: you can redistribute it and/or modify
+#
+# http://github.com/hpcugent/VSC-tools
+#
+# VSC-tools is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
+# the Free Software Foundation v2.
 #
 # VSC-tools is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -70,6 +74,10 @@ import copy
 from vsc.ldap.ldap_utils import convertTimestamp
 
 
+class LdapFilterError(Exception):
+    pass
+
+
 class LdapFilter(object):
     """Representing an LDAP filter with operators between the filter values.
 
@@ -105,8 +113,7 @@ class LdapFilter(object):
                 initialiser = ls[0]
             return reduce(lambda x, y: operator(x, y), ls[1:], initialiser)
         else:
-            # FIXME: not sure what should be returned here
-            return LdapFilter("")
+            raise LdapFilterError()
 
     def __and__(self, value):
         """Return a new filter that is the logical and operator of this filter and the provided value.
@@ -205,6 +212,8 @@ class TimestampFilter(LdapFilter):
         """
         super(TimestampFilter, self).__init__(value)
         self.timestamp = convertTimestamp(timestamp)[1]
+        if comparator != '>=' and comparator != '<=':
+            raise LdapFilterError()
         self.comparator = comparator
 
     def __str__(self):
@@ -236,3 +245,17 @@ class OlderThanFilter(TimestampFilter):
                          will be converted to a format LDAP groks.
         """
         super(OlderThanFilter, self).__init__(value, timestamp, '<=')
+
+
+class CnFilter(LdapFilter):
+    """Representa a filter that matches a given common name."""
+
+    def __init__(self, cn):
+        super(CnFilter, self).__init__("cn=%s" % (cn))
+
+
+class MemberFilter(LdapFilter):
+    """Represents a filter that looks if a member is listed in the memberUid."""
+
+    def __init__(self, user_id):
+        super(MemberFilter, self).__init__("memberUid=%s" % (user_id))

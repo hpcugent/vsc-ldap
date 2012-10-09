@@ -3,10 +3,13 @@
 #
 # Copyright 2012 Andy Georges
 #
-# This file is part of the tools originally by the HPC team of
-# Ghent University (http://hpc.ugent.be).
+# This file is part of VSC-tools,
+# originally created by the HPC team of the University of Ghent (http://ugent.be/hpc).
 #
-# This is free software: you can redistribute it and/or modify
+#
+# http://github.com/hpcugent/VSC-tools
+#
+# VSC-tools is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation v2.
 #
@@ -19,7 +22,7 @@
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 ##
 """
-High-level tools for interacting with the HPC LDAP for projects
+High-level tools for interacting with the LDAP for projects
 
 The LdapProject class will bind to the LDAP server using LdapQuery, so
 there is no need to do this manually.
@@ -36,7 +39,7 @@ from vsc.ldap.utils import LdapEntity
 
 
 class LdapProject(LdapEntity):
-    """Representing a project in the HPC LDAP database.
+    """Representing a project in the LDAP database.
 
     Requires initialisation using a unique identification.
 
@@ -73,14 +76,14 @@ class LdapProject(LdapEntity):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
         project_ldap_info = self.ldap_query.project_filter_search("cn=%s" % (self.project_id))
         if len(project_ldap_info) == 0:
-            self.logger.error("Could not find a project in the LDAP with the ID %s, raising NoSuchGroupError"
+            self.log.error("Could not find a project in the LDAP with the ID %s, raising NoSuchGroupError"
                               % (self.project_id))
             raise NoSuchProjectError(self.project_id)
 
         return project_ldap_info[0]  # there can be only one
 
     def add(self, ldap_attributes):
-        """Adds a new project to the HPC LDAP.
+        """Adds a new project to the LDAP.
 
         Does two things:
             - effectively inserts the data into the LDAP database

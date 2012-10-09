@@ -3,10 +3,13 @@
 #
 # Copyright 2012 Andy Georges
 #
-# This file is part of the tools originally by the HPC team of
-# Ghent University (http://hpc.ugent.be).
+# This file is part of VSC-tools,
+# originally created by the HPC team of the University of Ghent (http://ugent.be/hpc).
 #
-# This is free software: you can redistribute it and/or modify
+#
+# http://github.com/hpcugent/VSC-tools
+#
+# VSC-tools is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation v2.
 #
@@ -19,7 +22,7 @@
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 ##
 """
-High-level tools for interacting with the HPC LDAP for groups.
+High-level tools for interacting with the LDAP for groups.
 
 The LdapGroup class will bind to the LDAP server using LdapQuery, so
 there is no need to do this manually.
@@ -34,7 +37,7 @@ from vsc.ldap.utils import LdapEntity, LdapQuery
 
 
 class LdapGroup(LdapEntity):
-    """Representing a group in the HPC LDAP database.
+    """Representing a group in the LDAP database.
 
     Requires initialisation using a unique identification.
 
@@ -66,7 +69,7 @@ class LdapGroup(LdapEntity):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
         group_ldap_info = self.ldap_query.group_filter_search("cn=%s" % (self.group_id))
         if len(group_ldap_info) == 0:
-            self.logger.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError"
+            self.log.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError"
                               % (self.group_id))
             raise NoSuchGroupError(self.group_id)
 
@@ -80,7 +83,7 @@ class LdapGroup(LdapEntity):
         self.ldap_query.group_modify(self.group_id, attributes)
 
     def add(self, ldap_attributes):
-        """Adds a new group to the HPC LDAP.
+        """Adds a new group to the LDAP.
 
         Does two things:
             - effectively inserts the data into the LDAP database
