@@ -409,7 +409,7 @@ class LdapQuery:
 
         try:
             # returns ('cn=Subschema', <ldap.schema.subentry.SubSchema instance at 0x1986878>)
-            schematype, schema = ldap.schema.subentry.urlfetch(self.ldapurl.unparse())
+            schematype, schema = ldap.schema.subentry.urlfetch(self.ldap_url.unparse())
         except Exception, err:
             self.log.raiseException("Failed to fetch schema from url", err)
 
