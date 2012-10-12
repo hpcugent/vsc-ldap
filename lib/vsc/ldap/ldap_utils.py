@@ -218,7 +218,7 @@ class LdapConnection(object):
         try:
             self.ldap_connection.modify_s(dn, changes)
         except ldap.LDAPError, err:
-            self.log.raiseException("Ldap update failed: dn %s, changes %s [%s]" % (dn, changes), err)
+            self.log.raiseException("Ldap update failed: dn %s, changes %s" % (dn, changes), err)
 
     def add(self, dn, attributes):
         """Add an entry for the given distinguished name with the given attributes and their corresponding values.
