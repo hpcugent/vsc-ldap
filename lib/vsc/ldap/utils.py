@@ -51,7 +51,7 @@ class SchemaConfiguration(LdapConfiguration):
         self.project_multi_value_attributes = None
 
 
-class LdapQuery:
+class LdapQuery(object):
     """Singleton class to interact with the LDAP server.
 
     This level is LDAP-schema aware. It knows about the dn for people, groups, VOs and projects.
@@ -78,6 +78,8 @@ class LdapQuery:
 
         self.ldap.connect()
         self.ldap.bind()
+
+        self.schema = {}
 
     def group_filter_search(self, filter, attributes=None):
         """Perform an LDAP lookup in the group tree, based on the given filter.
@@ -397,8 +399,13 @@ class LdapQuery:
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
         self.ldap.add(dn, attributes.items())
 
-    def get_schema(self, ldap_obj_class_name_or_oid):
+    def get_schema(self, ldap_obj_class_name_or_oid, reload=False):
         """Get attributes as provided by schema
+
+        - we only do this once when it is requested
+        - we cache the result as this should not change in a single run
+        - unless the reload flag is set :-D
+
         @type ldap_obj_class_name_or_oid: LDAP class name or OID to get the schema from
                                          (passed to ldap.schema.subentry.SubSchema)
 
@@ -407,13 +414,20 @@ class LdapQuery:
         if self.ldap is None:
             self.bind()
 
+        if not reload and ldap_obj_class_name_or_oid in self.schema:
+            return self.schema[ldap_obj_class_name_or_oid]
+
+        self.schema[ldap_obj_class_name_or_oid] = {}
+        self.schema[ldap_obj_class_name_or_oid]['attr_to_oid'] = {}
+
         try:
             # returns ('cn=Subschema', <ldap.schema.subentry.SubSchema instance at 0x1986878>)
-            schematype, schema = ldap.schema.subentry.urlfetch(self.ldap_url.unparse())
-        except Exception, err:
-            self.log.raiseException("Failed to fetch schema from url", err)
+            schematype, schema = ldap.schema.subentry.urlfetch(self.ldap.ldap_url.unparse())
+        except ldap.LDAPError, _:
+            self.log.raiseException("Failed to fetch schema from url %s" % (self.ldap.ldap_url), ldap.LDAPError)
 
         attributes = {}
+
         if schematype == 'cn=Subschema':
             try:
                 # this returns a list of dicts
@@ -421,14 +435,14 @@ class LdapQuery:
                     attributes.update(x)
             except Exception, err:
                 self.log.raiseException("Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s"
-                                   % (schematype, ldap_obj_class_name_or_oid), err)
+                                   % (schematype, ldap_obj_class_name_or_oid), ldap.LDAPError)
         else:
             self.log.error('Unknown returned schematype %s' % schematype)
 
         if len(attributes) == 0:
             self.log.error("No attributes from schematype %s and ldap_obj_class_name_or_oid %s"
                            % (schematype, ldap_obj_class_name_or_oid))
-            return
+            return None
 
         for attr in attributes.values():
             oid = attr.oid
@@ -440,11 +454,11 @@ class LdapQuery:
             name = attr.names[0]
 
             if single:
-                self.attr[name] = None
+                self.schema[ldap_obj_class_name_or_oid][name] = None
             else:
-                self.attr[name] = []
+                self.schema[ldap_obj_class_name_or_oid][name] = []
 
-            self.attr2oid[name] = oid
+            self.schema[ldap_obj_class_name_or_oid]['attr_to_oid'][name] = oid
 
 
 class LdapEntity(object):
@@ -503,6 +517,7 @@ class LdapEntity(object):
                 either.
         """
         try:
+            # FIXME: we should check the schema
             ldap_info = object.__getattribute__(self, 'ldap_info')
             if ldap_info and name in ldap_info:
                 ldap_value = value
