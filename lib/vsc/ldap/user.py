@@ -69,7 +69,8 @@ class LdapUser(LdapEntity):
 
         @type user_id: string representing the ID of the user, i.e., his cn in LDAP.
         """
-        super(LdapUser, self).__init__()
+        super(LdapUser, self).__init__(['vscuser', 'posixAccount'])
+
         self.user_id = user_id
         self.vo = None
         self.group = None  # the corresponding group for the user.

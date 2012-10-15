@@ -62,7 +62,7 @@ class LdapGroup(LdapEntity):
 
         @raise NoSuchGroupError if the group cannot be found.
         """
-        super(LdapGroup, self).__init__()
+        super(LdapGroup, self).__init__(['posixGroup', 'vscgroup'])
         self.group_id = group_id
 
     def get_ldap_info(self):

@@ -469,7 +469,7 @@ class LdapQuery(object):
 class LdapEntity(object):
     """Base class for all things LDAP that work on a higher level."""
 
-    def __init__(self):
+    def __init__(self, object_classes=[]):
         """Initialisation.
 
         Note that the LdapQuery singleton should have been instantiated elsewhere.
@@ -477,7 +477,7 @@ class LdapEntity(object):
         self.ldap_query = LdapQuery(None)
         self.ldap_info = None
 
-        self.object_classes = []  # LDAP object class name for which the schema will be checked
+        self.object_classes = object_classes  # LDAP object class name for which the schema will be checked
 
         self.log = fancylogger.getLogger(self.__class__.__name__)
 
@@ -512,8 +512,9 @@ class LdapEntity(object):
         if new_ldap_info and name in new_ldap_info:
             return new_ldap_info[name]
         else:
+            object_classes = object.__getattribute__(self, 'object_classes')
             join = lambda it: (y for x in it for y in x)
-            attributes = list(join([self.ldap_query.get_schema(o).keys() for o in self.object_classes]))
+            attributes = list(join([self.ldap_query.get_schema(o).keys() for o in object_classes]))
             if name in attributes:
                 return None
 
@@ -531,8 +532,9 @@ class LdapEntity(object):
         """
         try:
             ldap_info = object.__getattribute__(self, 'ldap_info')
+            object_classes = object.__getattribute__(self, 'object_classes')
             join = lambda it: (y for x in it for y in x)
-            attributes = list(join([self.ldap_query.get_schema(o).keys() for o in self.object_classes]))
+            print "attributes = %s" % attributes
             if ldap_info and name in attributes:
                 ldap_value = value
                 if type(value) != list:

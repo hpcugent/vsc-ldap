@@ -69,7 +69,7 @@ class LdapProject(LdapEntity):
 
         @raise NoSuchProjectError if the project cannot be found.
         """
-        super(LdapProject, self).__init__()
+        super(LdapProject, self).__init__(['vscproject'])
         self.project_id = project_id
 
     def get_ldap_info(self):
