@@ -408,8 +408,15 @@ class LdapQuery(object):
 
         @type ldap_obj_class_name_or_oid: LDAP class name or OID to get the schema from
                                          (passed to ldap.schema.subentry.SubSchema)
+        @type reload: boolean indicating if the schema should be returned form the cache or reloaded from the LDAP
+                      server.
 
-        @raise:
+        @returns: dictionary containing details about the schema
+                  there is an entry for each attribute with the following keys
+                  - ['oid'] gives the corresponding oid for the attribute
+                  - ['single'] gives True for a single-value attribute, False otherwise
+
+        @raise: LDAPError when the schema cannot be fetched for the given object class
         """
         if self.ldap is None:
             self.bind()
@@ -418,7 +425,6 @@ class LdapQuery(object):
             return self.schema[ldap_obj_class_name_or_oid]
 
         self.schema[ldap_obj_class_name_or_oid] = {}
-        self.schema[ldap_obj_class_name_or_oid]['attr_to_oid'] = {}
 
         try:
             # returns ('cn=Subschema', <ldap.schema.subentry.SubSchema instance at 0x1986878>)
@@ -447,18 +453,17 @@ class LdapQuery(object):
         for attr in attributes.values():
             oid = attr.oid
             single = attr.single_value == 1
+            name = attr.names[0]
             if len(attr.names) > 1:
                 # what with multiple names?
                 self.log.error("Multiple names associated with attr, only using first one. From %s: oid %s names %s"
                                % (ldap_obj_class_name_or_oid, oid, attr.names))
-            name = attr.names[0]
 
-            if single:
-                self.schema[ldap_obj_class_name_or_oid][name] = None
-            else:
-                self.schema[ldap_obj_class_name_or_oid][name] = []
+            self.schema[ldap_obj_class_name_or_oid][name] = {}
+            self.schema[ldap_obj_class_name_or_oid][name]['single'] = single
+            self.schema[ldap_obj_class_name_or_oid][name]['oid'] = oid
 
-            self.schema[ldap_obj_class_name_or_oid]['attr_to_oid'][name] = oid
+        return self.schema[ldap_obj_class_name_or_oid]
 
 
 class LdapEntity(object):
@@ -471,6 +476,9 @@ class LdapEntity(object):
         """
         self.ldap_query = LdapQuery(None)
         self.ldap_info = None
+
+        self.object_classes = []  # LDAP object class name for which the schema will be checked
+
         self.log = fancylogger.getLogger(self.__class__.__name__)
 
     def get_ldap_info(self):
@@ -487,10 +495,10 @@ class LdapEntity(object):
 
     def __getattr__(self, name):
         """Getter for the LdapUser fields. Only accessed for fields that are in
-        the ldap_info dictionary, since these are not set in the instance
-        itseld. Otherwise, we never end up here.
+        the ldap_info dictionary or in the schema for the given object classes,
+        since these are not set in the instance itself. Otherwise, we never end up here.
 
-        @returns: the value corresponding to the 'name' atrribute in LDAP
+        @returns: the value corresponding to the 'name' attribute in LDAP
         """
 
         try:
@@ -504,6 +512,11 @@ class LdapEntity(object):
         if new_ldap_info and name in new_ldap_info:
             return new_ldap_info[name]
         else:
+            join = lambda it: (y for x in it for y in x)
+            attributes = list(join([self.ldap_query.get_schema(o).keys() for o in self.object_classes]))
+            if name in attributes:
+                return None
+
             object.__getattribute__(self, name)
 
     def __setattr__(self, name, value):
@@ -517,9 +530,10 @@ class LdapEntity(object):
                 either.
         """
         try:
-            # FIXME: we should check the schema
             ldap_info = object.__getattribute__(self, 'ldap_info')
-            if ldap_info and name in ldap_info:
+            join = lambda it: (y for x in it for y in x)
+            attributes = list(join([self.ldap_query.get_schema(o).keys() for o in self.object_classes]))
+            if ldap_info and name in attributes:
                 ldap_value = value
                 if type(value) != list:
                     ldap_value = [value]
