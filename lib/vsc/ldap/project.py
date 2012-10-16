@@ -29,8 +29,6 @@ there is no need to do this manually.
 
 If this code is extended, it should be Python 2.4 compatible until such time
 as all machines where we might require LDAP accesss.
-
-FIXME: naming of things should be made more consistent.
 """
 
 # --------------------------------------------------------------------

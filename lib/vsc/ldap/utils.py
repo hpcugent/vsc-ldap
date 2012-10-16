@@ -534,7 +534,7 @@ class LdapEntity(object):
             ldap_info = object.__getattribute__(self, 'ldap_info')
             object_classes = object.__getattribute__(self, 'object_classes')
             join = lambda it: (y for x in it for y in x)
-            print "attributes = %s" % attributes
+            attributes = list(join([self.ldap_query.get_schema(o).keys() for o in object_classes]))
             if ldap_info and name in attributes:
                 ldap_value = value
                 if type(value) != list:
