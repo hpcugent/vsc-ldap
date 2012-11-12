@@ -29,10 +29,10 @@ import re
 
 import vsc.fancylogger as fancylogger
 
-from vsc.dateandtime import Local
 from vsc.ldap.ldap_utils import LdapConnection, LdapConfiguration
 from vsc.ldap.filter import CnFilter, LdapFilter, MemberFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
+from vsc.utils.dateandtime import Local
 from vsc.utils.patterns import Singleton
 
 
