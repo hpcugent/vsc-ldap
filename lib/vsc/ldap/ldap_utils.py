@@ -34,7 +34,7 @@ import ldap.schema
 from ldapurl import LDAPUrl
 
 import vsc.fancylogger as fancylogger
-from vsc.dateandtime import Local, utc
+from vsc.utils.dateandtime import Local, utc
 
 LDAP_DATETIME_TIMEFORMAT = "%Y%m%d%H%M%SZ"
 
