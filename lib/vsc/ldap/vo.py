@@ -35,12 +35,12 @@ as all machines where we might require LDAP accesss.
 import vsc.fancylogger as fancylogger
 from vsc.ldap import NoSuchVoError
 from vsc.ldap.filter import CnFilter, MemberFilter
-from vsc.ldap.utils import LdapEntity
+from vsc.ldap.group import LdapGroup
 
-_logger = fancylogger.getLogger(__name__)
+_log = fancylogger.getLogger(__name__)
 
 
-class LdapVo(LdapEntity):
+class LdapVo(LdapGroup):
     """Representing a VO in the LDAP database.
 
     Requires initialisation using a unique identification.
@@ -66,8 +66,7 @@ class LdapVo(LdapEntity):
 
         @raise NoSuchVoError if the VO cannot be found.
         """
-        super(LdapVo, self).__init__()
-        self.vo_id = vo_id
+        super(LdapVo, self).__init__(vo_id)
 
     def get_ldap_info(self):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
@@ -78,21 +77,6 @@ class LdapVo(LdapEntity):
             raise NoSuchVoError(self.vo_id)
 
         return vo_ldap_info[0]  # there can be only one
-
-    def add(self, ldap_attributes):
-        """Adds a new vo to the LDAP.
-
-        Does two things:
-            - effectively inserts the data into the LDAP database
-            - fill in the attributes of the current instance, so we do not need to reload the data from the LDAP server
-              if we access an field of this instance.
-
-        @type ldap_attributes: dictionary with the LDAP field names and the associated values to insert.
-        """
-        ldap_attributes['objectClass'] = ['posixGroup', 'vscgroup']
-
-        self.ldap_query.vo_add(self.vo_id, ldap_attributes)
-        self.ldap_info = ldap_attributes
 
     @staticmethod
     def get_for_member(user):
