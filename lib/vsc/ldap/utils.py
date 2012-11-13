@@ -441,7 +441,7 @@ class LdapQuery(object):
                     attributes.update(x)
             except Exception, _:
                 self.log.raiseException("Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s"
-                                        % (schematype, ldap_obj_class_name_or_oid)):
+                                        % (schematype, ldap_obj_class_name_or_oid))
         else:
             self.log.error('Unknown returned schematype %s' % schematype)
 
