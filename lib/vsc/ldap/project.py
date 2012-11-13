@@ -58,6 +58,8 @@ class LdapProject(LdapEntity):
         - modify project attributes in the LDAP
     """
 
+    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixGroup', 'hpcproject']
+
     def __init__(self, project_id):
         """Initialisation.
 
@@ -67,7 +69,7 @@ class LdapProject(LdapEntity):
 
         @raise NoSuchProjectError if the project cannot be found.
         """
-        super(LdapProject, self).__init__(['vscproject'])
+        super(LdapProject, self).__init__(self.__class__.LDAP_OBJECT_CLASS_ATTRIBUTES)
         self.project_id = project_id
 
     def get_ldap_info(self):
@@ -90,7 +92,7 @@ class LdapProject(LdapEntity):
 
         @type ldap_attributes: dictionary with the LDAP field names and the associated values to insert.
         """
-        ldap_attributes['objectClass'] = ['posixGroup', 'vscproject']
+        ldap_attributes['objectClass'] = self.__class__.LDAP_OBJECT_CLASS_ATTRIBUTES
 
         self.ldap_query.project_add(self.project_id, ldap_attributes)
         self.ldap_info = ldap_attributes

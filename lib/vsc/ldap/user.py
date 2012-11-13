@@ -62,6 +62,9 @@ class LdapUser(LdapEntity):
         - modify user attributes in the LDAP
     """
 
+    # Override this in a subclass if other classes are needed.
+    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixAccount', 'hpcuser']
+
     def __init__(self, user_id):
         """Initialisation.
 
@@ -69,7 +72,7 @@ class LdapUser(LdapEntity):
 
         @type user_id: string representing the ID of the user, i.e., his cn in LDAP.
         """
-        super(LdapUser, self).__init__(['vscuser', 'posixAccount'])
+        super(LdapUser, self).__init__(self.__class__.LDAP_OBJECT_CLASS_ATTRIBUTES)
 
         self.user_id = user_id
         self.vo = None
@@ -157,7 +160,7 @@ class LdapUser(LdapEntity):
 
         @type ldap_attributes: dictionary with the LDAP field names and the associated values to insert.
         """
-        ldap_attributes['objectClass'] = ['posixAccount', 'vscuser']
+        ldap_attributes['objectClass'] = self.__class__.LDAP_OBJECT_CLASS_ATTRIBUTES
 
         self.ldap_query.user_add(self.user_id, ldap_attributes)
         self.ldap_info = ldap_attributes
