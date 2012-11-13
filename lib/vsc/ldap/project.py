@@ -77,7 +77,7 @@ class LdapProject(LdapEntity):
         project_ldap_info = self.ldap_query.project_filter_search("cn=%s" % (self.project_id))
         if len(project_ldap_info) == 0:
             self.log.error("Could not find a project in the LDAP with the ID %s, raising NoSuchGroupError"
-                              % (self.project_id))
+                           % (self.project_id))
             raise NoSuchProjectError(self.project_id)
 
         return project_ldap_info[0]  # there can be only one

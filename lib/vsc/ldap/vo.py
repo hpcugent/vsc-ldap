@@ -73,7 +73,7 @@ class LdapVo(LdapGroup):
         vo_ldap_info = self.ldap_query.vo_filter_search(CnFilter(self.vo_id))
         if len(vo_ldap_info) == 0:
             self.log.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError"
-                              % (self.vo_id))
+                           % (self.vo_id))
             raise NoSuchVoError(self.vo_id)
 
         return vo_ldap_info[0]  # there can be only one

@@ -73,7 +73,7 @@ class LdapGroup(LdapEntity):
         group_ldap_info = self.ldap_query.group_filter_search("cn=%s" % (self.group_id))
         if len(group_ldap_info) == 0:
             self.log.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError"
-                              % (self.group_id))
+                           % (self.group_id))
             raise NoSuchGroupError(self.group_id)
 
         return group_ldap_info[0]  # there can be only one
