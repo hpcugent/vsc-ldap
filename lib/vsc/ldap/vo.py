@@ -111,7 +111,7 @@ class LdapVo(LdapEntity):
 
         # there should be at most a single VO.
         if len(vos) > 1:
-            _logger.raiseException("Found multiple VOs for the given user (%s), vos = %s" % (user, vos), Exception())
+            _log.raiseException("Found multiple VOs for the given user (%s), vos = %s" % (user, vos))
 
         vo_info = vos[0]
 

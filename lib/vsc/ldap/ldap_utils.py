@@ -87,8 +87,8 @@ class LdapConnection(object):
         ldap_url = self.configuration.url
         try:
             self.ldap_connection = ldap.initialize(ldap_url)
-        except ldap.LDAPError, err:
-            self.log.raiseException("Failed to connect to the LDAP server at %s" % (ldap_url), ldap.LDAPError)
+        except ldap.LDAPError, _:
+            self.log.raiseException("Failed to connect to the LDAP server at %s" % (ldap_url))
 
         ## generate ldapurl obj after succesfull connect
         self.ldap_url = LDAPUrl(ldapUrl=ldap_url)
@@ -102,8 +102,8 @@ class LdapConnection(object):
         if not self.ldap_connection:
             try:
                 self.connect()
-            except ldap.LDAPError, err:
-                self.log.raiseException("Binding to LDAP failed - no connection.", ldap.LDAPError)
+            except ldap.LDAPError, _:
+                self.log.raiseException("Binding to LDAP failed - no connection.")
 
         password = self.configuration.password
         dn = self.configuration.connection_dn
@@ -111,8 +111,8 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.simple_bind_s(dn, password)
             self.log.debug("Binding to LDAP with dn %s resulted in %s" % (dn, res))
-        except ldap.LDAPError, err:
-            self.log.raiseException("Binding to LDAP failed", ldap.LDAPError)
+        except ldap.LDAPError, _:
+            self.log.raiseException("Binding to LDAP failed")
 
         ## update url after succesful bind
         ## WARNING self.ldap_url.unparse() will show the password. don't use it in logging !!
@@ -123,8 +123,6 @@ class LdapConnection(object):
         """Search the LDAP entries for the given attributes.
 
         @return: list of dictionaries with the requested attributes as keys
-
-        @raise LDAPError: if the service cannot be bound.
         """
         ## always rebind as in perl version?
         if self.ldap_connection is None:
@@ -158,9 +156,9 @@ class LdapConnection(object):
 
         try:
             res = self.ldap_connection.search_s(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes)
-        except ldap.LDAPError, err:
+        except ldap.LDAPError, _:
             self.log.raiseException("Ldap sync search failed: base %s, ldap_filter %s, attributes %s"
-                           % (base, ldap_filter, attributes), ldap.LDAPError)
+                           % (base, ldap_filter, attributes))
 
         return res
 
@@ -182,9 +180,9 @@ class LdapConnection(object):
 
         try:
             res = self.ldap_connection.search_st(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes, attrs_only, timeout)
-        except ldap.LDAPError, err:
+        except ldap.LDAPError, _:
             self.log.raiseException("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s: %s"
-                           % (base, ldap_filter, attributes), ldap.LDAPError)
+                           % (base, ldap_filter, attributes))
 
         return res
 
@@ -202,8 +200,8 @@ class LdapConnection(object):
         mod_attrs = [(ldap.MOD_REPLACE, attribute, value)]
         try:
             self.ldap_connection.modify_s(dn, mod_attrs)
-        except ldap.LDAPError, err:
-            self.log.raiseException("Ldap update failed: dn %s, attribute %s, value %s: %s" % (dn, attribute, value), ldap.LDAPError)
+        except ldap.LDAPError, _:
+            self.log.raiseException("Ldap update failed: dn %s, attribute %s, value %s: %s" % (dn, attribute, value))
 
     def modify_attributes(self, dn, changes):
         """Modify one or more attributes.
@@ -217,8 +215,8 @@ class LdapConnection(object):
 
         try:
             self.ldap_connection.modify_s(dn, changes)
-        except ldap.LDAPError, err:
-            self.log.raiseException("Ldap update failed: dn %s, changes %s" % (dn, changes), ldap.LDAPError)
+        except ldap.LDAPError, _:
+            self.log.raiseException("Ldap update failed: dn %s, changes %s" % (dn, changes))
 
     def add(self, dn, attributes):
         """Add an entry for the given distinguished name with the given attributes and their corresponding values.
@@ -237,8 +235,8 @@ class LdapConnection(object):
 
         try:
             self.ldap_connection.add_s(dn, changes)
-        except ldap.LDAPError, err:
-            self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]", (dn, changes), ldap.LDAPError)
+        except ldap.LDAPError, _:
+            self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]", (dn, changes))
 
 
 def convertTimestamp(timestamp=None):
