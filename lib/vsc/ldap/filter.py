@@ -259,3 +259,17 @@ class MemberFilter(LdapFilter):
 
     def __init__(self, user_id):
         super(MemberFilter, self).__init__("memberUid=%s" % (user_id))
+
+
+class LoginFilter(LdapFilter):
+    """Represents a filter that looks up a user based on his institute login name."""
+
+    def __init__(self, login):
+        super(LoginFilter, self).__init__("login=%s" % (login))
+
+
+class InstituteFilter(LdapFilter):
+    """Represents a filter that looks up a user based on his institute login name."""
+
+    def __init__(self, institute):
+        super(InstituteFilter, self).__init__("institute=%s" % (institute))
