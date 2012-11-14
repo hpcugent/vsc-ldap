@@ -270,6 +270,8 @@ class LdapQuery(object):
     """
     __metaclass__ = Singleton
 
+    VO_NAME_REGEX = re.compile(r'^(%s)vo\d{5}'%SITE_GROUP_PREFIX)
+
     def __init__(self, configuration):
         """
         Initalisation.

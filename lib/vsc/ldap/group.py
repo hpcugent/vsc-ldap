@@ -65,7 +65,7 @@ class LdapGroup(LdapEntity):
 
         @raise NoSuchGroupError if the group cannot be found.
         """
-        super(LdapGroup, self).__init__(self.__class__.LDAP_OBJECT_CLASS_ATTRIBUTES)
+        super(LdapGroup, self).__init__(self.LDAP_OBJECT_CLASS_ATTRIBUTES)
         self.group_id = group_id
 
     def get_ldap_info(self):
@@ -95,7 +95,7 @@ class LdapGroup(LdapEntity):
 
         @type ldap_attributes: dictionary with the LDAP field names and the associated values to insert.
         """
-        ldap_attributes['objectClass'] = self.__class__.LDAP_OBJECT_CLASS_ATTRIBUTES
+        ldap_attributes['objectClass'] = self.LDAP_OBJECT_CLASS_ATTRIBUTES
 
         self.ldap_query.group_add(self.group_id, ldap_attributes)
         self.ldap_info = ldap_attributes

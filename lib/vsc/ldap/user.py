@@ -72,7 +72,7 @@ class LdapUser(LdapEntity):
 
         @type user_id: string representing the ID of the user, i.e., his cn in LDAP.
         """
-        super(LdapUser, self).__init__(self.__class__.LDAP_OBJECT_CLASS_ATTRIBUTES)
+        super(LdapUser, self).__init__(self.LDAP_OBJECT_CLASS_ATTRIBUTES)
 
         self.user_id = user_id
         self.vo = None
@@ -160,7 +160,7 @@ class LdapUser(LdapEntity):
 
         @type ldap_attributes: dictionary with the LDAP field names and the associated values to insert.
         """
-        ldap_attributes['objectClass'] = self.__class__.LDAP_OBJECT_CLASS_ATTRIBUTES
+        ldap_attributes['objectClass'] = self.LDAP_OBJECT_CLASS_ATTRIBUTES
 
         self.ldap_query.user_add(self.user_id, ldap_attributes)
         self.ldap_info = ldap_attributes
