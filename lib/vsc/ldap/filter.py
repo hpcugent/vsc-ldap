@@ -71,7 +71,7 @@ fold & [f,g,h, g=1] -> (& (x=4) (y=5) (z=3) (g=1))
 """
 import copy
 
-from vsc.ldap.ldap_utils import convert_timestamp
+from vsc.ldap.utils import convert_timestamp
 
 
 class LdapFilterError(Exception):
