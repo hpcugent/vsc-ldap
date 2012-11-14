@@ -554,13 +554,14 @@ class LdapEntity(object):
             object.__setattr__(self, name, value)
 
 
-def read_timestamp(timestamp_pickle):
+def read_timestamp(filename):
     """Read the stored timestamp value from a pickled file.
 
     @returns: string representing a timestamp in the proper LDAP time format
 
     """
-    timestamp = timestamp_pickle.read()
+    cache = FileCache(filename)
+    timestamp = cache.load(0)
 
     if not timestamp is None and timestamp.tzinfo is None:
         # add local timezoneinfo
@@ -569,7 +570,7 @@ def read_timestamp(timestamp_pickle):
     return timestamp
 
 
-def write_timestamp(timestamp_pickle, timestamp):
+def write_timestamp(filename, timestamp):
     """Write the given timestamp to a pickled file.
 
     @type timestamp: datetime.datetime timestamp
@@ -579,4 +580,6 @@ def write_timestamp(timestamp_pickle, timestamp):
         # add local timezoneinfo
         timestamp = timestamp.replace(tzinfo=Local)
 
-    timestamp_pickle.write(timestamp)
+    cache = FileCache(filename)
+    cache.update(0, timestamp, 0)
+    cache.close()
