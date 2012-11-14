@@ -290,12 +290,25 @@ class LdapQuery(object):
 
         self.schema = {}
 
-    def group_filter_search(self, filter, attributes=None):
+    def _filter_search(self, base, multi_value_attributes, ldap_filter, attributes, post_filter):
+        entries = self.ldap.search(ldap_filter, base, attributes)
+        results = [self.__delist_ldap_return_value(e, multi_value_attributes, attributes) for e in entries]
+        if post_filter:
+            (attribute, regex) = post_filter
+            results = [r for r in results if regex.match(r[attribute])]
+
+        self.log.debug("_filter_search finds %d results" % (len(results)))
+        return results
+
+    def group_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the group tree, based on the given filter.
 
-        @type filter: string describing an LDAP filter or LdapFilter instance
+        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes.
+        @type post_filter: (attribute name, compiled regex), allows filtering the results
+                           based on the specified attribute matching the givenregex. Note
+                           that the attribute is matched, not searched.
 
         @returns: list of matching LDAP entries as dictionaries, limited to the requested attributes.
 
@@ -307,12 +320,12 @@ class LdapQuery(object):
 
         # for groups, we use the following base
         self.log.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
-        base = self.configuration.group_dn_base
-        entries = self.ldap.search(filter, base, attributes)
-        results = [self.__delist_ldap_return_value(e, self.configuration.group_multi_value_attributes, attributes)
-                   for e in entries]
-        self.log.debug("group_filter_search finds %d results" % (len(results)))
-        return results
+
+        return self._filter_search(self.configuration.group_dn_base,
+                                   self.configuration.group_multi_value_attributes,
+                                   ldap_filter,
+                                   attributes,
+                                   post_filter)
 
     def group_search(self, cn, member_uid, attributes=None):
         """Perform an LDAP lookup in the group tree, looking for the entry with given cn and memberUid.
@@ -336,10 +349,10 @@ class LdapQuery(object):
             self.log.debug("group_search returning None")
             return None
 
-    def vo_filter_search(self, filter, attributes=None):
+    def vo_filter_search(self, ldap_filter, attributes=None):
         """Perform an LDAP lookup for VOs, based on the given filter.
 
-        @type filter: string describing an LDAP filter or LdapFilter instance
+        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all the retrieved attributes.
         @returns: list of matching LDAP entries as dictionaries, limited to the requested attributes.
@@ -349,7 +362,7 @@ class LdapQuery(object):
         self.log.info("vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         if attributes and not 'cn' in attributes:
             attributes.append('cn')
-        results = self.group_filter_search(filter, attributes)
+        results = self.group_filter_search(ldap_filter, attributes)
         if not results is None:
             vo_name_regex = re.compile(r"^(a|b|g|l|v)vo\d{5}$")
             results = [r for r in results if len(r) > 0 and vo_name_regex.search(r['cn'])]
@@ -359,10 +372,10 @@ class LdapQuery(object):
             self.log.debug("vo_filter_search returning None")
             return []
 
-    def no_vo_filter_search(self, filter, attributes=None):
+    def no_vo_filter_search(self, ldap_filter, attributes=None):
         """Perform an LDAP lookup for non-VO groups, based on the given filter.
 
-        @type filter: string describing an LDAP filter or LdapFilter instance
+        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all the retrieved attributes.
         @returns: list of matching LDAP entries as dictionaries, limited to the requested attributes.
@@ -372,7 +385,7 @@ class LdapQuery(object):
         self.log.info("no_vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
         if attributes and not 'cn' in attributes:
             attributes.append('cn')
-        results = self.group_filter_search(filter, attributes)
+        results = self.group_filter_search(ldap_filter, attributes)
         if not results is None:
             vo_name_regex = re.compile(r"^(a|b|g|l|v)vo\d{5}$")
             results = [r for r in results if not vo_name_regex.search(r['cn'])]
@@ -421,12 +434,15 @@ class LdapQuery(object):
             self.log.debug("no_vo_search returning None")
             return None
 
-    def project_filter_search(self, filter, attributes=None):
+    def project_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the projects tree, based on the given filter.
 
-        @type filter: string describing an LDAP filter or LdapFilter instance
+        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes
+        @type post_filter: (attribute name, compiled regex), allows filtering the results
+                           based on the specified attribute matching the givenregex. Note
+                           that the attribute is matched, not searched.
 
         @returns: list of matching LDAP entries as dictionaries, limited to the requested attributes.
 
@@ -436,20 +452,21 @@ class LdapQuery(object):
             self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
-        self.log.info("project_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
-        base = self.configuration.project_dn_base
-        entries = self.ldap.search(filter, base, attributes)
-        results = [self.__delist_ldap_return_value(e, self.configuration.project_multi_value_attributes, attributes)
-                   for e in entries]
-        self.log.debug("project_filter_search finds %d results" % (len(results)))
-        return results
+        return self._filter_search(self.configuration.project_dn_base,
+                                   self.configuration.project_multi_value_attributes,
+                                   ldap_filter,
+                                   attributes,
+                                   post_filter)
 
-    def user_filter_search(self, filter, attributes=None):
+    def user_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the user tree, based on the given filter.
 
         @type filter: string describing an LDAP filter or LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes
+        @type post_filter: (attribute name, compiled regex), allows filtering the results
+                           based on the specified attribute matching the givenregex. Note
+                           that the attribute is matched, not searched.
 
         @returns: list of matching LDAP entries as dictionaries, limited to the requested attributes.
 
@@ -461,12 +478,11 @@ class LdapQuery(object):
 
         # For users, we use the following base:
         self.log.info("user_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
-        base = self.configuration.user_dn_base
-        entries = self.ldap.search(filter, base, attributes)
-        results = [self.__delist_ldap_return_value(e, self.configuration.user_multi_value_attributes, attributes)
-                   for e in entries]
-        self.log.debug("user_filter_search finds %d results" % (len(results)))
-        return results
+        return self._filter_search(self.configuration.user_dn_base,
+                                   self.configuration.user_multi_value_attributes,
+                                   ldap_filter,
+                                   attributes,
+                                   post_filter)
 
     def user_search(self, user_id, institute, attributes=None):
         """Perform an LDAP search for the given user and institute.
