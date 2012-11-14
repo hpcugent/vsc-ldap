@@ -258,8 +258,6 @@ class LdapConnection(object):
             self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]", (dn, changes))
 
 
-
-
 class LdapQuery(object):
     """Singleton class to interact with the LDAP server.
 
@@ -325,7 +323,7 @@ class LdapQuery(object):
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
         self.log.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
-                         % (cn, member_uid, attributes))
+                      % (cn, member_uid, attributes))
         cn_filter = CnFilter(cn)
         member_filter = MemberFilter(member_uid)
         result = self.group_filter_search(cn_filter & member_filter, attributes)
@@ -504,8 +502,8 @@ class LdapQuery(object):
         @type attributes: attribute names we wish to retain
         """
         kvs = [(k, v[0]) for (k, v) in entry.iteritems()
-                                    if (list_attributes is None or k not in list_attributes)
-                                    and (attributes is None or k in attributes)]
+                if (list_attributes is None or k not in list_attributes)
+                and (attributes is None or k in attributes)]
         # we do want to get all the attributes that provide multiple items
         for a in list_attributes:
             if (attributes is None or a in attributes) and a in entry:
@@ -536,7 +534,7 @@ class LdapQuery(object):
             self.log.error("group_modify did not find group with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchGroupError(cn)
         self.log.debug("group_modify current attribute values = %s - new attribute values = %s"
-                          % (current[0], attributes))
+                       % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
     def user_modify(self, cn, attributes):
@@ -553,7 +551,7 @@ class LdapQuery(object):
             self.log.error("user_modify did not find user with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchUserError(cn)
         self.log.debug("user_modify current attribute values = %s - new attribute values = %s"
-                          % (current[0], attributes))
+                       % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
     def project_modify(self, cn, attributes):
@@ -570,7 +568,7 @@ class LdapQuery(object):
             self.log.error("project_modify did not find project with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchProjectError(cn)
         self.log.debug("project_modify current attribute values = %s - new attribute values = %s"
-                          % (current[0], attributes))
+                       % (current[0], attributes))
         self.__modify(current[0], dn, attributes)
 
     def user_add(self, cn, attributes):
@@ -753,7 +751,7 @@ class LdapEntity(object):
                     self.ldap_info[name] = value
                 except ldap.LDAPError, _:
                     self.log.error("Could not save the new value %s for %s with cn=%s to the LDAP"
-                                      % (value, name, self.vsc_user_id))
+                                   % (value, name, self.vsc_user_id))
                     pass
             else:
                 object.__setattr__(self, name, value)
@@ -784,6 +782,7 @@ def convert_timestamp(timestamp=None):
     elif isinstance(timestamp, str):
         tmp = datetime.datetime.strptime(timestamp, LDAP_DATETIME_TIMEFORMAT)
         return (tmp.replace(tzinfo=utc).astimezone(Local), timestamp)
+
 
 def read_timestamp(filename):
     """Read the stored timestamp value from a pickled file.
