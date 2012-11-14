@@ -1,29 +1,28 @@
 #!/usr/bin/env python
 ##
 #
-# Copyright 2012 Andy Georges
+# copyright 2012 andy georges
 #
-# This file is part of VSC-tools,
-# originally created by the HPC team of the University of Ghent (http://ugent.be/hpc).
+# this file is part of vsc-tools,
+# originally created by the hpc team of the university of ghent (http://ugent.be/hpc).
 #
 #
-# http://github.com/hpcugent/VSC-tools
+# http://github.com/hpcugent/vsc-tools
 #
-# VSC-tools is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation v2.
+# vsc-tools is free software: you can redistribute it and/or modify
+# it under the terms of the gnu general public license as published by
+# the free software foundation v2.
 #
-# VSC-tools is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
+# vsc-tools is distributed in the hope that it will be useful,
+# but without any warranty; without even the implied warranty of
+# merchantability or fitness for a particular purpose. see the
+# gnu general public license for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
+# you should have received a copy of the gnu general public license
+# along with vsc-tools. if not, see <http://www.gnu.org/licenses/>.
 ##
 """Convenience classes for using the LDAP.
 """
-import datetime
 import ldap
 import ldap.modlist
 import ldap.schema
@@ -31,15 +30,10 @@ import ldap.schema
 from ldapurl import LDAPUrl
 
 import vsc.fancylogger as fancylogger
-import vsc.ldap.filters as filters
 
+from vsc.ldap.filters import CnFilter, LdapFilter, MemberFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
-from vsc.utils.cache import FileCache
-from vsc.utils.dateandtime import Local, utc
 from vsc.utils.patterns import Singleton
-
-
-LDAP_DATETIME_TIMEFORMAT = "%Y%m%d%H%M%SZ"
 
 
 class LdapConfiguration(object):
@@ -169,7 +163,7 @@ class LdapConnection(object):
         if self.ldap_connection is None:
             self.bind()
 
-        ## ldap_filter can also be an filters.LdapFilter instance
+        ## ldap_filter can also be an LdapFilter instance
         ldap_filter = "%s" % ldap_filter
 
         try:
@@ -193,7 +187,7 @@ class LdapConnection(object):
             self.bind()
         attrs_only = False
 
-        ## filter can also be filters.LdapFilter instance
+        ## filter can also be LdapFilter instance
         ldap_filter = "%s" % ldap_filter
 
         try:
@@ -303,7 +297,7 @@ class LdapQuery(object):
     def group_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the group tree, based on the given filter.
 
-        @type ldap_filter: string describing an LDAP filter or filters.LdapFilter instance
+        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes.
         @type post_filter: (attribute name, compiled regex), allows filtering the results
@@ -339,8 +333,8 @@ class LdapQuery(object):
         """
         self.log.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
                       % (cn, member_uid, attributes))
-        cn_filter = filters.CnFilter(cn)
-        member_filter = filters.MemberFilter(member_uid)
+        cn_filter = CnFilter(cn)
+        member_filter = MemberFilter(member_uid)
         result = self.group_filter_search(cn_filter & member_filter, attributes)
         self.log.debug("group_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
@@ -352,7 +346,7 @@ class LdapQuery(object):
     def project_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the projects tree, based on the given filter.
 
-        @type ldap_filter: string describing an LDAP filter or filters.LdapFilter instance
+        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes
         @type post_filter: (attribute name, compiled regex), allows filtering the results
@@ -376,7 +370,7 @@ class LdapQuery(object):
     def user_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the user tree, based on the given filter.
 
-        @type filter: string describing an LDAP filter or filters.LdapFilter instance
+        @type filter: string describing an LDAP filter or LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes
         @type post_filter: (attribute name, compiled regex), allows filtering the results
@@ -412,8 +406,8 @@ class LdapQuery(object):
 
         @returns: a dictionary, with the values for the requested attributes for the given user
         """
-        login_filter = filters.LdapFilter("instituteLogin=%s" % (user_id))
-        institute_filter = filters.LdapFilter("institute=%s" % (institute))
+        login_filter = LdapFilter("instituteLogin=%s" % (user_id))
+        institute_filter = LdapFilter("institute=%s" % (institute))
 
         result = self.user_filter_search(login_filter & institute_filter, attributes)
         self.log.debug("user_search for %s, %s yields %s" % (user_id, institute, result))
@@ -462,7 +456,7 @@ class LdapQuery(object):
         @raise: NoSuchGroupError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
-        current = self.group_filter_search(filters.CnFilter(cn))
+        current = self.group_filter_search(CnFilter(cn))
         if current is None:
             self.log.error("group_modify did not find group with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchGroupError(cn)
@@ -479,7 +473,7 @@ class LdapQuery(object):
         @raise: NoSuchUserError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
-        current = self.user_filter_search(filters.CnFilter(cn))
+        current = self.user_filter_search(CnFilter(cn))
         if current is None:
             self.log.error("user_modify did not find user with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchUserError(cn)
@@ -496,7 +490,7 @@ class LdapQuery(object):
         @raise: NoSuchProjectError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
-        current = self.project_filter_search(filters.CnFilter(cn))
+        current = self.project_filter_search(CnFilter(cn))
         if current is None:
             self.log.error("project_modify did not find project with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchProjectError(cn)
@@ -684,57 +678,3 @@ class LdapEntity(object):
             # in this case, insufficient initialisation, and we simply set the
             # values directly
             object.__setattr__(self, name, value)
-
-
-def convert_timestamp(timestamp=None):
-    """Convert a timestamp, yielding a string and a datetime.datetime instance.
-
-    @type timestamp: either a string or a datetime.datetime instance. Default value is None, in which case the
-                     local time is returned.
-
-    @returns: tuple with the timestamp as a
-                - LDAP formatted timestamp on GMT in the yyyymmddhhmmssZ format
-                - A datetime.datetime instance representing the timestamp
-    """
-    if timestamp is None:
-        timestamp = datetime.datetime.today()
-
-    if isinstance(timestamp, datetime.datetime):
-        if timestamp.tzinfo is None:
-            timestamp = timestamp.replace(tzinfo=Local)
-        return (timestamp, timestamp.astimezone(utc).strftime(LDAP_DATETIME_TIMEFORMAT))
-
-    elif isinstance(timestamp, str):
-        tmp = datetime.datetime.strptime(timestamp, LDAP_DATETIME_TIMEFORMAT)
-        return (tmp.replace(tzinfo=utc).astimezone(Local), timestamp)
-
-
-def read_timestamp(filename):
-    """Read the stored timestamp value from a pickled file.
-
-    @returns: string representing a timestamp in the proper LDAP time format
-
-    """
-    cache = FileCache(filename)
-    timestamp = cache.load(0)
-
-    if not timestamp is None and timestamp.tzinfo is None:
-        # add local timezoneinfo
-        timestamp = timestamp.replace(tzinfo=Local)
-
-    return timestamp
-
-
-def write_timestamp(filename, timestamp):
-    """Write the given timestamp to a pickled file.
-
-    @type timestamp: datetime.datetime timestamp
-    """
-
-    if timestamp.tzinfo is None:
-        # add local timezoneinfo
-        timestamp = timestamp.replace(tzinfo=Local)
-
-    cache = FileCache(filename)
-    cache.update(0, timestamp, 0)
-    cache.close()
