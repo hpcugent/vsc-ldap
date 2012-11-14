@@ -71,7 +71,7 @@ fold & [f,g,h, g=1] -> (& (x=4) (y=5) (z=3) (g=1))
 """
 import copy
 
-from vsc.ldap.utils import convert_timestamp
+import vsc.ldap.utils as utils
 
 
 class LdapFilterError(Exception):
@@ -211,7 +211,7 @@ class TimestampFilter(LdapFilter):
         @type comparator: string representing a comparison operation, e.g., <=, >=
         """
         super(TimestampFilter, self).__init__(value)
-        self.timestamp = convert_timestamp(timestamp)[1]
+        self.timestamp = utils.convert_timestamp(timestamp)[1]
         if comparator != '>=' and comparator != '<=':
             raise LdapFilterError()
         self.comparator = comparator

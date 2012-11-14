@@ -27,13 +27,12 @@ import datetime
 import ldap
 import ldap.modlist
 import ldap.schema
-import re
 
 from ldapurl import LDAPUrl
 
 import vsc.fancylogger as fancylogger
+import vsc.ldap.filters as filters
 
-from vsc.ldap.filter import CnFilter, LdapFilter, MemberFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
 from vsc.utils.cache import FileCache
 from vsc.utils.dateandtime import Local, utc
@@ -170,7 +169,7 @@ class LdapConnection(object):
         if self.ldap_connection is None:
             self.bind()
 
-        ## ldap_filter can also be an LdapFilter instance
+        ## ldap_filter can also be an filters.LdapFilter instance
         ldap_filter = "%s" % ldap_filter
 
         try:
@@ -194,7 +193,7 @@ class LdapConnection(object):
             self.bind()
         attrs_only = False
 
-        ## filter can also be LdapFilter instance
+        ## filter can also be filters.LdapFilter instance
         ldap_filter = "%s" % ldap_filter
 
         try:
@@ -304,7 +303,7 @@ class LdapQuery(object):
     def group_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the group tree, based on the given filter.
 
-        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
+        @type ldap_filter: string describing an LDAP filter or filters.LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes.
         @type post_filter: (attribute name, compiled regex), allows filtering the results
@@ -340,8 +339,8 @@ class LdapQuery(object):
         """
         self.log.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
                       % (cn, member_uid, attributes))
-        cn_filter = CnFilter(cn)
-        member_filter = MemberFilter(member_uid)
+        cn_filter = filters.CnFilter(cn)
+        member_filter = filters.MemberFilter(member_uid)
         result = self.group_filter_search(cn_filter & member_filter, attributes)
         self.log.debug("group_search for %s, %s yields %s" % (cn, member_uid, result))
         if not result is None and len(result) > 0:
@@ -353,7 +352,7 @@ class LdapQuery(object):
     def project_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the projects tree, based on the given filter.
 
-        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
+        @type ldap_filter: string describing an LDAP filter or filters.LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes
         @type post_filter: (attribute name, compiled regex), allows filtering the results
@@ -377,7 +376,7 @@ class LdapQuery(object):
     def user_filter_search(self, ldap_filter, attributes=None, post_filter=None):
         """Perform an LDAP lookup in the user tree, based on the given filter.
 
-        @type filter: string describing an LDAP filter or LdapFilter instance
+        @type filter: string describing an LDAP filter or filters.LdapFilter instance
         @type attributes: list of strings describing LDAP attributes. If this is
                           None (default), we return all retrieved attributes
         @type post_filter: (attribute name, compiled regex), allows filtering the results
@@ -413,8 +412,8 @@ class LdapQuery(object):
 
         @returns: a dictionary, with the values for the requested attributes for the given user
         """
-        login_filter = LdapFilter("instituteLogin=%s" % (user_id))
-        institute_filter = LdapFilter("institute=%s" % (institute))
+        login_filter = filters.LdapFilter("instituteLogin=%s" % (user_id))
+        institute_filter = filters.LdapFilter("institute=%s" % (institute))
 
         result = self.user_filter_search(login_filter & institute_filter, attributes)
         self.log.debug("user_search for %s, %s yields %s" % (user_id, institute, result))
@@ -463,7 +462,7 @@ class LdapQuery(object):
         @raise: NoSuchGroupError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
-        current = self.group_filter_search(CnFilter(cn))
+        current = self.group_filter_search(filters.CnFilter(cn))
         if current is None:
             self.log.error("group_modify did not find group with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchGroupError(cn)
@@ -480,7 +479,7 @@ class LdapQuery(object):
         @raise: NoSuchUserError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
-        current = self.user_filter_search(CnFilter(cn))
+        current = self.user_filter_search(filters.CnFilter(cn))
         if current is None:
             self.log.error("user_modify did not find user with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchUserError(cn)
@@ -497,7 +496,7 @@ class LdapQuery(object):
         @raise: NoSuchProjectError
         """
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
-        current = self.project_filter_search(CnFilter(cn))
+        current = self.project_filter_search(filters.CnFilter(cn))
         if current is None:
             self.log.error("project_modify did not find project with cn = %s (dn = %s)" % (cn, dn))
             raise NoSuchProjectError(cn)
