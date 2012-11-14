@@ -261,16 +261,17 @@ class LdapConnection(object):
 class LdapQuery(object):
     """Singleton class to interact with the LDAP server.
 
-    This level is LDAP-schema aware. It knows about the dn for people, groups, VOs and projects.
+    This level is LDAP-schema aware. It knows about the dn for people, groups and projects.
 
     Allows searching for
         - users
         - groups
-        - VOs (these are a VSC-specific thingie, in LDAP they're simply groups)
+        - projects
+
+    If distinct group types that are required that are identified, e.g., by specific names, subclass LdapQuery
+    and/or use the post_filter arguments.
     """
     __metaclass__ = Singleton
-
-    VO_NAME_REGEX = re.compile(r'^(%s)vo\d{5}'%SITE_GROUP_PREFIX)
 
     def __init__(self, configuration):
         """
@@ -347,91 +348,6 @@ class LdapQuery(object):
             return result[0]
         else:
             self.log.debug("group_search returning None")
-            return None
-
-    def vo_filter_search(self, ldap_filter, attributes=None):
-        """Perform an LDAP lookup for VOs, based on the given filter.
-
-        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
-        @type attributes: list of strings describing LDAP attributes. If this is
-                          None (default), we return all the retrieved attributes.
-        @returns: list of matching LDAP entries as dictionaries, limited to the requested attributes.
-
-        @raise ldap.OTHER if the LDAP connection was not properly instantiated
-        """
-        self.log.info("vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
-        if attributes and not 'cn' in attributes:
-            attributes.append('cn')
-        results = self.group_filter_search(ldap_filter, attributes)
-        if not results is None:
-            vo_name_regex = re.compile(r"^(a|b|g|l|v)vo\d{5}$")
-            results = [r for r in results if len(r) > 0 and vo_name_regex.search(r['cn'])]
-            self.log.debug("vo_filter_search retains %d results after applying VO filter" % (len(results)))
-            return results
-        else:
-            self.log.debug("vo_filter_search returning None")
-            return []
-
-    def no_vo_filter_search(self, ldap_filter, attributes=None):
-        """Perform an LDAP lookup for non-VO groups, based on the given filter.
-
-        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
-        @type attributes: list of strings describing LDAP attributes. If this is
-                          None (default), we return all the retrieved attributes.
-        @returns: list of matching LDAP entries as dictionaries, limited to the requested attributes.
-
-        @raise ldap.OTHER if the LDAP connection was not properly instantiated
-        """
-        self.log.info("no_vo_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
-        if attributes and not 'cn' in attributes:
-            attributes.append('cn')
-        results = self.group_filter_search(ldap_filter, attributes)
-        if not results is None:
-            vo_name_regex = re.compile(r"^(a|b|g|l|v)vo\d{5}$")
-            results = [r for r in results if not vo_name_regex.search(r['cn'])]
-            self.log.debug("no_vo_filter_search retains %d results after applying VO filter" % (len(results)))
-            return results
-        else:
-            self.log.debug("no_vo_filter_search returning None")
-            return []
-
-    def vo_search(self, cn, member_uid, attributes=None):
-        """Perform an LDAP lookup in the group tree, looking for the VO with given cn and memberUid.
-
-        @type cn: string representing the desired common name in the LDAP database
-        @type member_uid: string representing the member's user id in the LDAP database?
-        @type attributes: list of strings describing LDAP attributes. If this is
-                          None (default), we return all the retrieved attributes
-        @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
-        """
-        cn_filter = CnFilter(cn)
-        member_filter = MemberFilter(member_uid)
-        result = self.vo_filter_search(cn_filter & member_filter, attributes)
-        self.log.debug("vo_search for %s, %s yields %s" % (cn, member_uid, result))
-        if not result is None and len(result) > 0:
-            return result[0]
-        else:
-            self.log.debug("vo_search returning None")
-            return None
-
-    def no_vo_search(self, cn, member_uid, attributes=None):
-        """Perform an LDAP lookup in the group tree, looking for the non-VO entry with given cn and memberUid.
-
-        @type cn: string representing the desired common name in the LDAP database
-        @type member_uid: string representing the member's user id in the LDAP database?
-        @type attributes: list of strings describing LDAP attributes. If this is
-                          None (default), we return all the retrieved attributes
-
-        @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
-        """
-        cn_filter = CnFilter(cn)
-        member_filter = MemberFilter(member_uid)
-        result = self.no_vo_filter_search(cn_filter & member_filter, attributes)
-        self.log.debug("no_vo_search for %s, %s yields %s" % (cn, member_uid, result))
-        if not result is None and len(result) > 0:
-            return result[0]
-        else:
-            self.log.debug("no_vo_search returning None")
             return None
 
     def project_filter_search(self, ldap_filter, attributes=None, post_filter=None):
@@ -597,14 +513,6 @@ class LdapQuery(object):
         """
         dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
         self.ldap.add(dn, attributes.items())
-
-    def vo_add(self, cn, attributes):
-        """Add the values for the given attributes.
-
-        @type cn: string representing the common name for the VO. Together with the subtree, this forms the dn.
-        @type attributes: dictionary with attributes for which a value should be added
-        """
-        self.group_add(cn, attributes)
 
     def group_add(self, cn, attributes):
         """Add the values for the given attributes.
