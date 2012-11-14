@@ -763,7 +763,7 @@ class LdapEntity(object):
             object.__setattr__(self, name, value)
 
 
-def convertTimestamp(timestamp=None):
+def convert_timestamp(timestamp=None):
     """Convert a timestamp, yielding a string and a datetime.datetime instance.
 
     @type timestamp: either a string or a datetime.datetime instance. Default value is None, in which case the
