@@ -37,7 +37,6 @@ from vsc.ldap import NoSuchUserError
 from vsc.ldap.utils import LdapQuery, LdapEntity
 from vsc.ldap.group import LdapGroup
 from vsc.ldap.project import LdapProject
-from vsc.ldap.vo import LdapVo
 
 
 class LdapUser(LdapEntity):
@@ -96,26 +95,6 @@ class LdapUser(LdapEntity):
         @type attributes: dictionary with the LDAP attributes.
         """
         self.ldap_query.user_modify(self.user_id, attributes)
-
-    def get_vo(self, reload=False):
-        """Return the LdapVo instance of the VO a users belongs to.
-
-        Assumes the VO has not changed. This can be overidden by providing the reload
-        argument, otherwise, the cached version will be returned.
-
-        @type reload: boolean that forces a reload of the VO.
-
-        @returns: LdapVo instance or None if the user does not belong to a non-default VO.
-
-        FIXME: This might need to move to a higher level, since the VOs are a VSC concept.
-        """
-
-        if not reload and self.vo:
-            return self.vo
-
-        self.vo = LdapVo.get_for_member(self)
-
-        return self.vo
 
     def get_group(self, reload=False):
         """Return the LdapGroup that corresponds to this user.
