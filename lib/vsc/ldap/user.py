@@ -62,7 +62,7 @@ class LdapUser(LdapEntity):
     """
 
     # Override this in a subclass if other classes are needed.
-    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixAccount', 'hpcuser']
+    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixAccount']
 
     def __init__(self, user_id):
         """Initialisation.

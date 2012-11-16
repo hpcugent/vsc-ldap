@@ -54,7 +54,7 @@ class LdapGroup(LdapEntity):
     """
 
     # Override this in a subclass if other classes are needed.
-    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixGroup', 'hpcgroup']
+    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixGroup']
 
     def __init__(self, group_id):
         """Initialisation.
