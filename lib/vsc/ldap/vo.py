@@ -32,9 +32,10 @@ as all machines where we might require LDAP accesss.
 """
 
 # --------------------------------------------------------------------
+from vsc import fancylogger
 from vsc.ldap import NoSuchVoError
-from vsc.ldap.filter import CnFilter, MemberFilter
-from vsc.ldap.group import LdapGroup
+from vsc.ldap.filters import CnFilter, MemberFilter
+from vsc.ldap.utils import LdapEntity
 
 _log = fancylogger.getLogger(__name__)
 
