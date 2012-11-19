@@ -34,9 +34,10 @@ as all machines where we might require LDAP accesss.
 
 # --------------------------------------------------------------------
 from vsc.ldap import NoSuchUserError
-from vsc.ldap.utils import LdapQuery, LdapEntity
+from vsc.ldap.filters import CnFilter
 from vsc.ldap.group import LdapGroup
 from vsc.ldap.project import LdapProject
+from vsc.ldap.utils import LdapQuery, LdapEntity
 
 
 class LdapUser(LdapEntity):
@@ -62,7 +63,7 @@ class LdapUser(LdapEntity):
     """
 
     # Override this in a subclass if other classes are needed.
-    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixAccount', 'hpcuser']
+    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixAccount']
 
     def __init__(self, user_id):
         """Initialisation.
@@ -81,7 +82,8 @@ class LdapUser(LdapEntity):
     def get_ldap_info(self):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field.
         """
-        user_ldap_info = self.ldap_query.user_filter_search(filter="cn=%s" % (self.user_id))
+        cn_filter = CnFilter(self.user_id)
+        user_ldap_info = self.ldap_query.user_filter_search(ldap_filter=cn_filter)
         if len(user_ldap_info) == 0:
             self.log.error("Could not find a user in the LDAP with the ID %s, raising NoSuchUserError"
                            % (self.user_id))

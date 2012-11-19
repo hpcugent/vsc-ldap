@@ -58,7 +58,8 @@ class LdapProject(LdapEntity):
         - modify project attributes in the LDAP
     """
 
-    LDAP_OBJECT_CLASS_ATTRIBUTES = ['posixGroup', 'hpcproject']
+    # Add at least one structural object class in a subclass.
+    LDAP_OBJECT_CLASS_ATTRIBUTES = []
 
     def __init__(self, project_id):
         """Initialisation.

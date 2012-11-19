@@ -60,10 +60,12 @@ class SchemaConfiguration(LdapConfiguration):
         self.user_dn_base = None
         self.group_dn_base = None
         self.project_dn_base = None
+        self.vo_dn_base = None
 
         self.user_multi_value_attributes = None
         self.group_multi_value_attributes = None
         self.project_multi_value_attributes = None
+        self.vo_multi_value_attributes = None
 
 
 class LdapConnection(object):
@@ -363,6 +365,30 @@ class LdapQuery(object):
 
         return self._filter_search(self.configuration.project_dn_base,
                                    self.configuration.project_multi_value_attributes,
+                                   ldap_filter,
+                                   attributes,
+                                   post_filter)
+
+    def vo_filter_search(self, ldap_filter, attributes=None, post_filter=None):
+        """Perform an LDAP lookup in the VO tree, based on the given filter.
+
+        @type ldap_filter: string describing an LDAP filter or LdapFilter instance
+        @type attributes: list of strings describing LDAP attributes. If this is
+                          None (default), we return all retrieved attributes
+        @type post_filter: (attribute name, compiled regex), allows filtering the results
+                           based on the specified attribute matching the givenregex. Note
+                           that the attribute is matched, not searched.
+
+        @returns: list of matching LDAP entries as dictionaries, limited to the requested attributes.
+
+        @raise ldap.OTHER if the LDAP connection was not properly instantiated
+        """
+        if not self.ldap:
+            self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
+            raise ldap.OTHER()
+
+        return self._filter_search(self.configuration.vo_dn_base,
+                                   self.configuration.vo_multi_value_attributes,
                                    ldap_filter,
                                    attributes,
                                    post_filter)
