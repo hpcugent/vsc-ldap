@@ -61,7 +61,7 @@ def read_timestamp(filename):
 
     """
     cache = FileCache(filename)
-    timestamp = cache.load(0)
+    (_, timestamp) = cache.load(0)
 
     if not timestamp is None and timestamp.tzinfo is None:
         # add local timezoneinfo
