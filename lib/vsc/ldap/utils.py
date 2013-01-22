@@ -315,7 +315,7 @@ class LdapQuery(object):
             raise ldap.OTHER()
 
         # for groups, we use the following base
-        self.log.info("group_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.info("group_filter_search: ldap_filter = %s, requested attributes = %s" % (ldap_filter, attributes))
 
         return self._filter_search(self.configuration.group_dn_base,
                                    self.configuration.group_multi_value_attributes,
