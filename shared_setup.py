@@ -84,7 +84,7 @@ except:
 ag = ('Andy Georges', 'andy.georges@ugent.be')
 jt = ('Jens Timmermans', 'jens.timmermans@ugent.be')
 kh = ('Kenneth Hoste', 'kenneth.hoste@ugent.be')
-lm = ('Luis Fernando Munoz Meji­as', 'luis.munoz@ugent.be')
+lm = ('Luis Fernando Munoz Mejiï¿½as', 'luis.munoz@ugent.be')
 sdw = ('Stijn De Weirdt', 'stijn.deweirdt@ugent.be')
 wdp = ('Wouter Depypere', 'wouter.depypere@ugent.be')
 
@@ -150,18 +150,6 @@ def cleanup(prefix=''):
         if os.path.isfile(ffn):
             os.remove(ffn)
 
-    make_setup(prefix=prefix)
-
-def make_setup(name='base',prefix=''):
-    """Create the setup.py
-        - default is base
-    """
-    fn = '%ssetup_%s.py' % (prefix, name)
-    if os.path.isfile(fn):
-        shutil.copyfile(fn, 'setup.py')
-    else:
-        log.error("setup file %s for name %s not found" % (fn, name))
-
 def sanitize(v):
     """Transforms v into a sensible string for use in setup.cfg."""
     if isinstance(v, str):
@@ -223,11 +211,7 @@ def build_setup_cfg_for_bdist_rpm(target):
 def action_target(target, setupfn=setup, extra_sdist=[]):
     EXTRA_SDIST_FILES.extend(extra_sdist)
     name = '_'.join(target['name'].split('-')[1:])
-
     cleanup()
-
-    make_setup(name)
-
     build_setup_cfg_for_bdist_rpm(target)
     x = parse_target(target)
     setupfn(**x)
