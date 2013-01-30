@@ -412,7 +412,7 @@ class LdapQuery(object):
             raise ldap.OTHER()
 
         # For users, we use the following base:
-        self.log.info("user_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.info("user_filter_search: filter = %s, requested attributes = %s" % (ldap_filter, attributes))
         return self._filter_search(self.configuration.user_dn_base,
                                    self.configuration.user_multi_value_attributes,
                                    ldap_filter,
