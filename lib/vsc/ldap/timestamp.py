@@ -1,27 +1,35 @@
 #!/usr/bin/env python
-##
+# -*- coding: latin-1 -*-
 #
-# copyright 2012 andy georges
+# Copyright 2009-2012 Ghent University
 #
-# this file is part of vsc-tools,
-# originally created by the hpc team of the university of ghent (http://ugent.be/hpc).
+# This file is part of vsc-ldap
+# originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
+# with support of Ghent University (http://ugent.be/hpc),
+# the Flemish Supercomputer Centre (VSC) (https://vscentrum.be/nl/en),
+# the Hercules foundation (http://www.herculesstichting.be/in_English)
+# and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
 #
+# http://github.com/hpcugent/vsc-ldap
 #
-# http://github.com/hpcugent/vsc-tools
+# vsc-ldap is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation v2.
 #
-# vsc-tools is free software: you can redistribute it and/or modify
-# it under the terms of the gnu general public license as published by
-# the free software foundation v2.
+# vsc-ldap is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
 #
-# vsc-tools is distributed in the hope that it will be useful,
-# but without any warranty; without even the implied warranty of
-# merchantability or fitness for a particular purpose. see the
-# gnu general public license for more details.
+# You should have received a copy of the GNU General Public License
+# along with vsc-ldap. If not, see <http://www.gnu.org/licenses/>.
 #
-# you should have received a copy of the gnu general public license
-# along with vsc-tools. if not, see <http://www.gnu.org/licenses/>.
-##
-"""Timestamp tools for this LDAP library."""
+#!/usr/bin/env python
+"""Timestamp tools for this LDAP library.
+
+@author: Andy Georges
+@author: Stijn De Weirdt
+"""
 
 import datetime
 
