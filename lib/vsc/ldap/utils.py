@@ -315,7 +315,7 @@ class LdapQuery(object):
             raise ldap.OTHER()
 
         # for groups, we use the following base
-        self.log.info("group_filter_search: ldap_filter = %s, requested attributes = %s" % (ldap_filter, attributes))
+        self.log.debug("group_filter_search: ldap_filter = %s, requested attributes = %s" % (ldap_filter, attributes))
 
         return self._filter_search(self.configuration.group_dn_base,
                                    self.configuration.group_multi_value_attributes,
@@ -333,7 +333,7 @@ class LdapQuery(object):
 
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
-        self.log.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
+        self.log.debug("group_search: cn = %s, member_uid = %s, requested attributes = %s"
                       % (cn, member_uid, attributes))
         cn_filter = CnFilter(cn)
         member_filter = MemberFilter(member_uid)
@@ -412,7 +412,7 @@ class LdapQuery(object):
             raise ldap.OTHER()
 
         # For users, we use the following base:
-        self.log.info("user_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.debug("user_filter_search: filter = %s, requested attributes = %s" % (ldap_filter, attributes))
         return self._filter_search(self.configuration.user_dn_base,
                                    self.configuration.user_multi_value_attributes,
                                    ldap_filter,
