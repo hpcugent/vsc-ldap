@@ -178,7 +178,7 @@ class LdapFilter(object):
         if self.root == previous_operator:
             return "%s %s" % (left_string, right_string)
         else:
-            return "(%s %s %s)" % (self.root, left_string, right_string)
+            return "(%s%s%s)" % (self.root, left_string, right_string)
 
     def _combine(self, operator, value=None):
         """Updates the tree with a new root, i.e., the given operator and
