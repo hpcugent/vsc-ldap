@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-#
+##
 # Copyright 2009-2012 Ghent University
 #
 # This file is part of vsc-ldap
@@ -23,7 +23,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with vsc-ldap. If not, see <http://www.gnu.org/licenses/>.
-#
+##
 """
 This module contains classes that allow constructing filter for an LDAP search in
 a straightforward and intuitive manner.
