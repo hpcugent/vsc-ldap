@@ -35,7 +35,7 @@ from shared_setup import action_target
 
 PACKAGE = {
     'name': 'vsc-ldap',
-    'install_requires': ['vsc-base >= 0.90'],
+    'install_requires': ['vsc-base >= 1.0'],
     'version': '0.94',
     'author': [ag, sdw, wdp],
     'maintainer': [ag],
