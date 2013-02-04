@@ -1,6 +1,6 @@
 # vsc-ldap
 
-[![Build Status](https://jenkins1.ugent.be/job/vsc_ldap/badge/icon)](https://jenkins1.ugent.be/job/vsc_ldap/)
+[![Build Status](https://jenkins1.ugent.be/job/vsc-ldap/badge/icon)](https://jenkins1.ugent.be/job/vsc-ldap/)
 
 This repository is part of the VSC tools, which are common tools used within our
 organization.
