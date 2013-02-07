@@ -29,7 +29,7 @@ import ldap.schema
 
 from ldapurl import LDAPUrl
 
-import vsc.fancylogger as fancylogger
+from vsc import fancylogger
 
 from vsc.ldap.filters import CnFilter, LdapFilter, MemberFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
