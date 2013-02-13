@@ -28,7 +28,7 @@
 vsc.ldap package.
 
 Provides:
-- Errors raised by the VSC LDAP package
+ - Errors raised by the VSC LDAP package
 
 @author: Andy Georges
 @author: Stijn De Weirdt
