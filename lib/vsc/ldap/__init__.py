@@ -24,7 +24,8 @@
 # You should have received a copy of the GNU General Public License
 # along with vsc-ldap. If not, see <http://www.gnu.org/licenses/>.
 ##
-"""vsc.ldap package.
+"""
+vsc.ldap package.
 
 Provides:
 - Errors raised by the VSC LDAP package
