@@ -7,11 +7,8 @@ organization.
 
 Originally created by the HPC team of Ghent University (http://ugent.be/hpc).
 
-
-# Namespaces and tools
-
-## vsc
-Common namespace used by all our python modules.
+# Documentation
+https://jenkins1.ugent.be/view/VSC%20tools/job/vsc-ldap/Documentation/?
 
 ### ldap Collection of utilities to ease interaction with the LDAP servers.
 Examples of the schema's used can be provided, although we do not include them
