@@ -43,7 +43,7 @@ from vsc.ldap.utils import LdapEntity
 from vsc.utils.fancylogger import getLogger
 
 
-_log = fancylogger.getLogger(__name__)
+_log = getLogger(__name__)
 
 
 class LdapVo(LdapEntity):
