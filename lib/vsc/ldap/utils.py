@@ -1,27 +1,34 @@
 #!/usr/bin/env python
+# -*- coding: latin-1 -*-
 ##
+# Copyright 2009-2012 Ghent University
 #
-# copyright 2012 andy georges
+# This file is part of vsc-ldap
+# originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
+# with support of Ghent University (http://ugent.be/hpc),
+# the Flemish Supercomputer Centre (VSC) (https://vscentrum.be/nl/en),
+# the Hercules foundation (http://www.herculesstichting.be/in_English)
+# and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
 #
-# this file is part of vsc-tools,
-# originally created by the hpc team of the university of ghent (http://ugent.be/hpc).
+# http://github.com/hpcugent/vsc-ldap
 #
+# vsc-ldap is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation v2.
 #
-# http://github.com/hpcugent/vsc-tools
+# vsc-ldap is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
 #
-# vsc-tools is free software: you can redistribute it and/or modify
-# it under the terms of the gnu general public license as published by
-# the free software foundation v2.
-#
-# vsc-tools is distributed in the hope that it will be useful,
-# but without any warranty; without even the implied warranty of
-# merchantability or fitness for a particular purpose. see the
-# gnu general public license for more details.
-#
-# you should have received a copy of the gnu general public license
-# along with vsc-tools. if not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with vsc-ldap. If not, see <http://www.gnu.org/licenses/>.
 ##
 """Convenience classes for using the LDAP.
+
+@author: Andy Georges
+@author: Stijn De Weirdt
+@author: Wouter Depypere
 """
 import ldap
 import ldap.modlist
@@ -315,7 +322,7 @@ class LdapQuery(object):
             raise ldap.OTHER()
 
         # for groups, we use the following base
-        self.log.info("group_filter_search: ldap_filter = %s, requested attributes = %s" % (ldap_filter, attributes))
+        self.log.debug("group_filter_search: ldap_filter = %s, requested attributes = %s" % (ldap_filter, attributes))
 
         return self._filter_search(self.configuration.group_dn_base,
                                    self.configuration.group_multi_value_attributes,
@@ -333,7 +340,7 @@ class LdapQuery(object):
 
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
-        self.log.info("group_search: cn = %s, member_uid = %s, requested attributes = %s"
+        self.log.debug("group_search: cn = %s, member_uid = %s, requested attributes = %s"
                       % (cn, member_uid, attributes))
         cn_filter = CnFilter(cn)
         member_filter = MemberFilter(member_uid)
@@ -412,7 +419,7 @@ class LdapQuery(object):
             raise ldap.OTHER()
 
         # For users, we use the following base:
-        self.log.info("user_filter_search: filter = %s, requested attributes = %s" % (filter, attributes))
+        self.log.debug("user_filter_search: filter = %s, requested attributes = %s" % (ldap_filter, attributes))
         return self._filter_search(self.configuration.user_dn_base,
                                    self.configuration.user_multi_value_attributes,
                                    ldap_filter,
