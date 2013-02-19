@@ -32,6 +32,7 @@ Unit tests for the vsc.ldap.filters.
 """
 
 import copy
+from operator import __and__
 import random
 
 # support for paycheck in Python 2.4
@@ -188,12 +189,17 @@ class TestLdapFilter(TestCase):
     def test_from_list_and(self, fs):
         """Test the formation of a filters from a given list of filters using the and operator."""
 
-        if not fs:
+        if not fs or len(fs) < 2:
             return
 
-        combination = LdapFilter.from_list(LdapFilter.__and__, fs)
+        combination = LdapFilter.from_list(lambda x, y: x & y, fs)
         combination_string = "%s" % (combination)
+
         self.assertTrue(len(combination_string) <= 3 + sum(map(lambda f: len("%s" % (f)), fs)))
+
+        self.assertTrue(combination_string[0] == '(')
+        self.assertTrue(combination_string[1] == '&')
+        self.assertTrue(combination_string[-1] == ')')
 
 
 def suite():
