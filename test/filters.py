@@ -88,6 +88,9 @@ class LdapFilterGenerator(PayCheckGenerator):
         self.attributes = [
             'cn',
             'status',
+            'institute',
+            'memberUid',
+            'moderator',
         ]
 
         self.operators = (
