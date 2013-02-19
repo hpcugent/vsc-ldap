@@ -47,25 +47,25 @@ g = (y=5)
 h = (z=3)
 
 >>> print "f & g -> %s" % (f & g)
-f & g -> (& (x=4) (y=5))
+f & g -> (&(x=4)(y=5))
 >>> print "f -> %s" % f
 f -> (x=4)
 >>> print "g -> %s" % g
 g -> (y=5)
 
 >>> print "(f & g) | h -> %s" % ((f & g) | h)
-(f & g) | h -> (| (& (x=4) (y=5)) (z=3))
+(f & g) | h -> (|(&(x=4)(y=5))(z=3))
 >>> print "f & g | h -> %s" % (f & g | h)
-f & g | h -> (| (& (x=4) (y=5)) (z=3))
+f & g | h -> (|(&(x=4)(y=5))(z=3))
 >>> print "f & (g | h) -> %s" % (f & (g | h))
-f & (g | h) -> (& (x=4) (| (y=5) (z=3)))
+f & (g | h) -> (&(x=4)(|(y=5)(z=3)))
 
 >>> print "f & g & h -> %s" % (f & g & h)
-f & g & h -> (& (x=4) (y=5) (z=3))
+f & g & h -> (&(x=4)(y=5)(z=3))
 >>> print "f & g & h | f -> %s" % (f & g & h | f)
-f & g & h | f -> (| (& (x=4) (y=5) (z=3)) (x=4))
+f & g & h | f -> (|(&(x=4)(y=5)(z=3))(x=4))
 >>> print "! f -> %s" % (f.negate())
-! f -> (! (x=4) )
+! f -> (!(x=4) )
 
 >>> print "fold & [f,g,h] -> %s" % LdapFilter.from_list(lambda x, y: x & y, [f, g, h])
 fold & [f,g,h] -> (& (x=4) (y=5) (z=3))
