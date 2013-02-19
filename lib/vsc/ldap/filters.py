@@ -181,7 +181,7 @@ class LdapFilter(object):
             right_string = ""
 
         if self.root == previous_operator:
-            return "%s %s" % (left_string, right_string)
+            return "%s%s" % (left_string, right_string)
         else:
             return "(%s%s%s)" % (self.root, left_string, right_string)
 
