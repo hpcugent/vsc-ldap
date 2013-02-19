@@ -141,6 +141,7 @@ class TestLdapFilter(TestCase):
 
     @with_checker(LdapFilter, LdapFilter)
     def test_and(self, left, right):
+        """Test the and operator for combining two filters."""
         combination = (left & right)
 
         left_string = "%s" % (left)
@@ -157,6 +158,7 @@ class TestLdapFilter(TestCase):
 
     @with_checker(LdapFilter, LdapFilter)
     def test_or(self, left, right):
+        """Test the or operator for combining two filters."""
         combination = left | right
 
         left_string = "%s" % (left)
@@ -173,6 +175,7 @@ class TestLdapFilter(TestCase):
 
     @with_checker(LdapFilter)
     def test_negate(self, left):
+        """Test the negation operator of a filter."""
         negation = left.negate()
 
         negation_string = "%s" % (negation)
@@ -180,6 +183,17 @@ class TestLdapFilter(TestCase):
         self.assertTrue(negation_string[0] == '(')
         self.assertTrue(negation_string[1] == '!')
         self.assertTrue(negation_string[-1] == ')')
+
+    @with_checker([LdapFilter])
+    def test_from_list_and(self, fs):
+        """Test the formation of a filters from a given list of filters using the and operator."""
+
+        if not fs:
+            return
+
+        combination = LdapFilter.from_list(LdapFilter.__and__, fs)
+        combination_string = "%s" % (combination)
+        self.assertTrue(len(combination_string) <= 3 + sum(map(lambda f: len("%s" % (f)), fs)))
 
 
 def suite():
