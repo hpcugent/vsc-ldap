@@ -29,22 +29,16 @@
 # to indicate their contents in a more appropriate way. We do not do this for the packages when shipped to
 # PyPi, since it is pretty obvious these are Python packages in any case.
 
-all_packages=vsc-ldap
+all_packages=
 edit=
 release=
-
-which rpmrebuild >& /dev/null
-if [ $? -gt 0 ]
-then
-    echo "Missing rpmrebuild"
-    exit 1
-fi
 
 while getopts er:p:h name
 do
   case $name in
     e) edit="-e";;
     r) release="$OPTARG";;
+    p) all_packages="$OPTARG";;
     h) printf "Usage: %s [-e] [-r RELEASE] [-p PACKAGE]" $0
        echo
        echo "  -e            Edit the generated spec file before rebuilding the RPM"
@@ -54,18 +48,21 @@ do
   esac
 done
 
-ALL_PACKAGES=$all_packages
+if [ -z "$all_packages" ]; then
+  ALL_PACKAGES=`python ./setup.py --name 2>/dev/null | grep -v "removing 'build'" | tr "\n" " "`
+else
+  ALL_PACKAGES=$all_packages
+fi
 
 for package in $ALL_PACKAGES; do
-  echo "Building RPM for $package"
-  setup=`echo ${package#vsc-} |tr '-' '_'`
-  python ./setup_${setup}.py  bdist_rpm
-  # get latest one (name-version syntax)
-  rpm_target=`ls -t dist/${package}-[0-9]*noarch.rpm | head -1`
+
+  echo $package
+  python ./setup.py bdist_rpm
+  rpm_target=`ls dist/${package}*noarch.rpm`
   rpm_target_name=`basename ${rpm_target}`
 
   # user specified requirements can be found in setup.cfg
-  requirements=`grep "requires" setup.cfg | cut -d" " -f3- | tr "," "\n" | grep -v "^python-" | tr "\n" "|" | sed -e 's/|$//'`
+  requirements=`grep "requires" setup.cfg | cut -d" " -f3- | tr "," "|"`
   if [ -z "$requirements" ]; then
     requirements="no-match-etc-etc-etc"
   fi
@@ -80,5 +77,4 @@ for package in $ALL_PACKAGES; do
              --change-spec-requires="sed -r 's/^Requires:(\s\s*)(${requirements})/Requires:\1python-\2/'" \
              --change-spec-preamble="sed -e 's/^\(Release:\s\s*\)\(.*\)\s*$/\1${release}.ug/'" \
              ${edit} -n -p ${rpm_target}
-   echo "Finished building RPM for $package"
 done
