@@ -107,7 +107,7 @@ except:
     from distutils.command.install_scripts import install_scripts
     from distutils.command.build_py import build_py
     from distutils.command.sdist import sdist
-    from distutile.command.bdist_rpm import bdist_rpm, _bdist_rpm
+    from distutils.command.bdist_rpm import bdist_rpm, _bdist_rpm
 
     class vsc_egg_info(object):
         pass  # dummy class for distutils
@@ -127,7 +127,6 @@ sdw = ('Stijn De Weirdt', 'stijn.deweirdt@ugent.be')
 wdp = ('Wouter Depypere', 'wouter.depypere@ugent.be')
 
 
-# FIXME: do we need this here? it won;t hurt, but still ...
 class vsc_install_scripts(install_scripts):
     """Create the (fake) links for mympirun also remove .sh and .py extensions from the scripts."""
 
