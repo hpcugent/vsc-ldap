@@ -31,20 +31,33 @@ Setup for the vsc ldap utilities
 @author: Stijn De Weirdt
 """
 
+import shared_setup
 from shared_setup import ag, sdw, wdp
-from shared_setup import action_target
 
+
+def remove_bdist_rpm_source_file():
+    """List of files to remove from the (source) RPM."""
+    return ['lib/vsc/__init__.py']
+
+
+shared_setup.remove_extra_bdist_rpm_files = remove_bdist_rpm_source_file
+shared_setup.SHARED_TARGET.update({
+    'url': 'https://github.ugent.be/hpcugent/vsc-ldap',
+    'download_url': 'https://github.ugent.be/hpcugent/vsc-ldap'
+})
+
+	
 PACKAGE = {
     'name': 'vsc-ldap',
-    'install_requires': ['vsc-base >= 1.0'],
+    'install_requires': ['vsc-base >= 0.90', 'python-ldap'],
     'version': '0.94',
     'author': [ag, sdw, wdp],
     'maintainer': [ag],
-    'packages': ['vsc.ldap'],
+    'packages': ['vsc', 'vsc.ldap'],
     'namespace_packages': ['vsc'],
     'scripts': [],
     'provides': ['python-vsc-packages-ldap = 0.3'],
 }
 
 if __name__ == '__main__':
-    action_target(PACKAGE)
+    shared_setup.action_target(PACKAGE)
