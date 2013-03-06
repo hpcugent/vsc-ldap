@@ -36,10 +36,10 @@ import ldap.schema
 
 from ldapurl import LDAPUrl
 
-from vsc import fancylogger
 
 from vsc.ldap.filters import CnFilter, LdapFilter, MemberFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
+from vsc.utils.fancylogger import getLogger
 from vsc.utils.patterns import Singleton
 
 
@@ -55,7 +55,7 @@ class LdapConfiguration(object):
         self.validation_method = None
         self.check_server_certificate = False
 
-        self.log = fancylogger.getLogger(self.__class__.__name__)
+        self.log = getLogger(self.__class__.__name__)
 
 
 class SchemaConfiguration(LdapConfiguration):
@@ -93,7 +93,7 @@ class LdapConnection(object):
         @type configuration: vsc.ldap.utils.Configuration subclass instance, implementing the actual functions to request
                              information.
         """
-        self.log = fancylogger.getLogger(name=self.__class__.__name__)
+        self.log = getLogger(name=self.__class__.__name__)
         self.configuration = configuration
         self.ldap_connection = None
 
@@ -284,7 +284,7 @@ class LdapQuery(object):
         If you initialise using None as the configuration, this will not fail
         if the singleton has already been created.
         """
-        self.log = fancylogger.getLogger(name=self.__class__.__name__)
+        self.log = getLogger(name=self.__class__.__name__)
         self.configuration = configuration
         self.ldap = LdapConnection(configuration)
 
@@ -638,7 +638,7 @@ class LdapEntity(object):
 
         self.object_classes = object_classes  # LDAP object class name for which the schema will be checked
 
-        self.log = fancylogger.getLogger(self.__class__.__name__)
+        self.log = getLogger(self.__class__.__name__)
 
     def get_ldap_info(self):
         pass

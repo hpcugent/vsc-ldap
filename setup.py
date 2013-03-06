@@ -42,11 +42,11 @@ def remove_bdist_rpm_source_file():
 
 shared_setup.remove_extra_bdist_rpm_files = remove_bdist_rpm_source_file
 shared_setup.SHARED_TARGET.update({
-    'url': 'https://github.ugent.be/hpcugent/vsc-config',
-    'download_url': 'https://github.ugent.be/hpcugent/vsc-config'
+    'url': 'https://github.ugent.be/hpcugent/vsc-ldap',
+    'download_url': 'https://github.ugent.be/hpcugent/vsc-ldap'
 })
 
-
+	
 PACKAGE = {
     'name': 'vsc-ldap',
     'install_requires': ['vsc-base >= 0.90', 'python-ldap'],
