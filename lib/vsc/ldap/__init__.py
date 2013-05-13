@@ -27,11 +27,22 @@
 """
 vsc.ldap package.
 
-Provides:
- - Errors raised by the VSC LDAP package
+This package provides tools to connect and query an ldap server, and easily filter the results.
+
+example usage:
+
+>>> # create a configuration object
+>>> from vsc.ldap.utils import LdapConfiguration
+>>> from vsc.ldap.utils import LdapQuery
+>>> uc = LdapConfiguration(url='ldap.eid.belgium.be', connection_dn='dc=eid,dc=belgium,dc=be')
+>>> l = LdapQuery(uc)
+>>> l.user_filter_search('sn=Smith')
+[{}]
+
 
 @author: Andy Georges
 @author: Stijn De Weirdt
+@author: Jens Timmerman
 """
 
 #the vsc.ldap namespace is used in different folders allong the system
