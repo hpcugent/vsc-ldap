@@ -46,14 +46,19 @@ from vsc.utils.patterns import Singleton
 class LdapConfiguration(object):
     """Represents some LDAP configuration.
 
-    This is an abstract class and should be implemented elsewhere.
+    @param url: url to ldap server (default None)
+    @param password: ldap password (default None)
+    @param connection_dn: ldap dn as a string, e.g., 'dc=eid,dc=belgium,dc=be' (default None
+    @param validation_method: constant from ldap, (default ldap.OPT_X_TLS_DEMAND )
+    see http://www.python-ldap.org/doc/html/ldap.html
+    @param check_certificate: bool, check the server certificate? (default False)
     """
-    def __init__(self):
-        self.url = None
-        self.password = None
-        self.connection_dn = None
-        self.validation_method = None
-        self.check_server_certificate = False
+    def __init__(self, url=None, password=None, connection_dn=None, validation_method=None, check_certificate=False):
+        self.url = url
+        self.password = password
+        self.connection_dn = connection_dn
+        self.validation_method = validation_method
+        self.check_server_certificate = check_certificate
 
         self.log = getLogger(self.__class__.__name__)
 
@@ -108,7 +113,7 @@ class LdapConnection(object):
         ldap_url = self.configuration.url
         try:
             self.ldap_connection = ldap.initialize(ldap_url)
-        except ldap.LDAPError, _:
+        except ldap.LDAPError:
             self.log.raiseException("Failed to connect to the LDAP server at %s" % (ldap_url))
 
         ## generate ldapurl obj after succesfull connect
@@ -123,7 +128,7 @@ class LdapConnection(object):
         if not self.ldap_connection:
             try:
                 self.connect()
-            except ldap.LDAPError, _:
+            except ldap.LDAPError:
                 self.log.raiseException("Binding to LDAP failed - no connection.")
 
         password = self.configuration.password
@@ -132,7 +137,7 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.simple_bind_s(dn, password)
             self.log.debug("Binding to LDAP with dn %s resulted in %s" % (dn, res))
-        except ldap.LDAPError, _:
+        except ldap.LDAPError:
             self.log.raiseException("Binding to LDAP failed")
 
         ## update url after succesful bind
@@ -177,7 +182,7 @@ class LdapConnection(object):
 
         try:
             res = self.ldap_connection.search_s(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes)
-        except ldap.LDAPError, _:
+        except ldap.LDAPError:
             self.log.raiseException("Ldap sync search failed: base %s, ldap_filter %s, attributes %s"
                                     % (base, ldap_filter, attributes))
 
@@ -201,7 +206,7 @@ class LdapConnection(object):
 
         try:
             res = self.ldap_connection.search_st(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes, attrs_only, timeout)
-        except ldap.LDAPError, _:
+        except ldap.LDAPError:
             self.log.raiseException("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s: %s"
                                     % (base, ldap_filter, attributes))
 
@@ -221,7 +226,7 @@ class LdapConnection(object):
         mod_attrs = [(ldap.MOD_REPLACE, attribute, value)]
         try:
             self.ldap_connection.modify_s(dn, mod_attrs)
-        except ldap.LDAPError, _:
+        except ldap.LDAPError:
             self.log.raiseException("Ldap update failed: dn %s, attribute %s, value %s: %s" % (dn, attribute, value))
 
     def modify_attributes(self, dn, changes):
@@ -236,7 +241,7 @@ class LdapConnection(object):
 
         try:
             self.ldap_connection.modify_s(dn, changes)
-        except ldap.LDAPError, _:
+        except ldap.LDAPError:
             self.log.raiseException("Ldap update failed: dn %s, changes %s" % (dn, changes))
 
     def add(self, dn, attributes):
@@ -256,7 +261,7 @@ class LdapConnection(object):
 
         try:
             self.ldap_connection.add_s(dn, changes)
-        except ldap.LDAPError, _:
+        except ldap.LDAPError:
             self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]", (dn, changes))
 
 
@@ -341,7 +346,7 @@ class LdapQuery(object):
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
         self.log.debug("group_search: cn = %s, member_uid = %s, requested attributes = %s"
-                      % (cn, member_uid, attributes))
+                       % (cn, member_uid, attributes))
         cn_filter = CnFilter(cn)
         member_filter = MemberFilter(member_uid)
         result = self.group_filter_search(cn_filter & member_filter, attributes)
@@ -462,8 +467,8 @@ class LdapQuery(object):
         @type attributes: attribute names we wish to retain
         """
         kvs = [(k, v[0]) for (k, v) in entry.iteritems()
-                if (list_attributes is None or k not in list_attributes)
-                and (attributes is None or k in attributes)]
+               if (list_attributes is None or k not in list_attributes)
+               and (attributes is None or k in attributes)]
         # we do want to get all the attributes that provide multiple items
         for a in list_attributes:
             if (attributes is None or a in attributes) and a in entry:
@@ -588,7 +593,7 @@ class LdapQuery(object):
         try:
             # returns ('cn=Subschema', <ldap.schema.subentry.SubSchema instance at 0x1986878>)
             schematype, schema = ldap.schema.subentry.urlfetch(self.ldap.ldap_url.unparse())
-        except ldap.LDAPError, _:
+        except ldap.LDAPError:
             self.log.raiseException("Failed to fetch schema from url %s" % (self.ldap.ldap_url))
 
         attributes = {}
@@ -598,7 +603,7 @@ class LdapQuery(object):
                 # this returns a list of dicts
                 for x in schema.attribute_types([ldap_obj_class_name_or_oid]):
                     attributes.update(x)
-            except Exception, _:
+            except Exception:
                 self.log.raiseException("Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s"
                                         % (schematype, ldap_obj_class_name_or_oid))
         else:
@@ -665,7 +670,7 @@ class LdapEntity(object):
             if new_ldap_info is None:
                 new_ldap_info = self.get_ldap_info()
                 object.__setattr__(self, 'ldap_info', new_ldap_info)
-        except AttributeError, _:
+        except AttributeError:
             self.log.raiseException("Tried to access an unknown attribute %s" % (name))
 
         if new_ldap_info and name in new_ldap_info:
@@ -701,13 +706,13 @@ class LdapEntity(object):
                 try:
                     self.modify_ldap({name: ldap_value})
                     self.ldap_info[name] = value
-                except ldap.LDAPError, _:
+                except ldap.LDAPError:
                     self.log.error("Could not save the new value %s for %s with cn=%s to the LDAP"
                                    % (value, name, self.vsc_user_id))
                     pass
             else:
                 object.__setattr__(self, name, value)
-        except AttributeError, _:
+        except AttributeError:
             # in this case, insufficient initialisation, and we simply set the
             # values directly
             object.__setattr__(self, name, value)
