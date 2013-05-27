@@ -56,7 +56,7 @@ def convert_timestamp(timestamp=None):
             timestamp = timestamp.replace(tzinfo=Local)
         return (timestamp, timestamp.astimezone(utc).strftime(LDAP_DATETIME_TIMEFORMAT))
 
-    elif isinstance(timestamp, str):
+    elif isinstance(timestamp, basestring):
         tmp = datetime.datetime.strptime(timestamp, LDAP_DATETIME_TIMEFORMAT)
         return (tmp.replace(tzinfo=utc).astimezone(Local), timestamp)
 
@@ -68,11 +68,7 @@ def read_timestamp(filename):
 
     """
     cache = FileCache(filename)
-    (_, timestamp) = cache.load(0)
-
-    if not timestamp is None and timestamp.tzinfo is None:
-        # add local timezoneinfo
-        timestamp = timestamp.replace(tzinfo=Local)
+    (_, timestamp) = cache.load('timestamp')
 
     return timestamp
 
@@ -83,10 +79,13 @@ def write_timestamp(filename, timestamp):
     @type timestamp: datetime.datetime timestamp
     """
 
-    if timestamp.tzinfo is None:
+    if isinstance(timestamp, datetime.datetime) and timestamp.tzinfo is None:
         # add local timezoneinfo
-        timestamp = timestamp.replace(tzinfo=Local)
+        timestamp_ = timestamp.replace(tzinfo=Local)
+        (_, timestamp_) = convert_timestamp(timestamp)
+    else:
+        timestamp_ = timestamp
 
     cache = FileCache(filename)
-    cache.update(0, timestamp, 0)
+    cache.update('timestamp', timestamp_, 0)
     cache.close()
