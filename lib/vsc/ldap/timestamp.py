@@ -56,7 +56,7 @@ def convert_timestamp(timestamp=None):
             timestamp = timestamp.replace(tzinfo=Local)
         return (timestamp, timestamp.astimezone(utc).strftime(LDAP_DATETIME_TIMEFORMAT))
 
-    elif isinstance(timestamp, str) or isinstance(timestamp, unicode):
+    elif isinstance(timestamp, basestring):
         tmp = datetime.datetime.strptime(timestamp, LDAP_DATETIME_TIMEFORMAT)
         return (tmp.replace(tzinfo=utc).astimezone(Local), timestamp)
 
