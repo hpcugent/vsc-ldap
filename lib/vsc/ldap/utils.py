@@ -58,9 +58,17 @@ class LdapConfiguration(object):
         self.password = password
         self.connection_dn = connection_dn
         self.validation_method = validation_method
-        self.check_server_certificate = check_certificate
+        self.check_server_certificate = lambda : check_certificate
 
         self.log = getLogger(self.__class__.__name__)
+
+    def tls_settings():
+        """
+        Set up the LDAP for a TLS connection.
+        """
+
+        # FIXME:maybe we want some default configuration here?
+        pass
 
 
 class SchemaConfiguration(LdapConfiguration):
@@ -107,17 +115,17 @@ class LdapConnection(object):
 
         @raise ldap.LDAPError if the connection cannot be established
         """
-        if self.configuration.check_server_certificate:
-            ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, self.configuration.validation_method)
+        # set security options through the configuration
 
-        ldap_url = self.configuration.url
-        try:
-            self.ldap_connection = ldap.initialize(ldap_url)
-        except ldap.LDAPError:
-            self.log.raiseException("Failed to connect to the LDAP server at %s" % (ldap_url))
-
-        ## generate ldapurl obj after succesfull connect
-        self.ldap_url = LDAPUrl(ldapUrl=ldap_url)
+        # we connect on a first listed, first tried basis
+        for url in self.configuration.urls:
+            try:
+                self.configuration.tls_settings(url)
+                self.ldap_connection = ldap.initialize(url)
+                self.ldap_url = LDAPUrl(ldapUrl=url)
+                break
+            except ldap.LDAPError:
+                self.log.raiseException("Failed to connect to the LDAP server at %s" % (url))
 
     def bind(self):
         """Bind to the LDAP service.
