@@ -29,6 +29,8 @@ Setup for the vsc ldap utilities
 
 @author: Andy Georges
 @author: Stijn De Weirdt
+@author: Wouter Depypere
+@author: Kenneth Hoste
 """
 
 import vsc.install.shared_setup as shared_setup
@@ -50,8 +52,8 @@ shared_setup.SHARED_TARGET.update({
 PACKAGE = {
     'name': 'vsc-ldap',
     'install_requires': ['vsc-base >= 1.2', 'python-ldap'],
-    'version': '1.2',
-    'author': [ag, sdw, wdp],
+    'version': '1.2.1',
+    'author': [ag, sdw, wdp, kh],
     'maintainer': [ag],
     'packages': ['vsc', 'vsc.ldap'],
     'namespace_packages': ['vsc'],
