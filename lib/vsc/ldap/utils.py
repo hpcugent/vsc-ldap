@@ -62,7 +62,7 @@ class LdapConfiguration(object):
 
         self.log = getLogger(self.__class__.__name__)
 
-    def tls_settings():
+    def tls_settings(self, url):
         """
         Set up the LDAP for a TLS connection.
         """
