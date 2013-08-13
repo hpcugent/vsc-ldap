@@ -34,7 +34,7 @@ Setup for the vsc ldap utilities
 """
 
 import vsc.install.shared_setup as shared_setup
-from vsc.install.shared_setup import ag, sdw, wdp
+from vsc.install.shared_setup import ag, kh, sdw, wdp
 
 
 def remove_bdist_rpm_source_file():
@@ -53,7 +53,7 @@ PACKAGE = {
     'name': 'vsc-ldap',
     'install_requires': ['vsc-base >= 1.2', 'python-ldap'],
     'version': '1.2.1',
-    'author': [ag, sdw, wdp, kh],
+    'author': [ag, kh, sdw, wdp],
     'maintainer': [ag],
     'packages': ['vsc', 'vsc.ldap'],
     'namespace_packages': ['vsc'],
