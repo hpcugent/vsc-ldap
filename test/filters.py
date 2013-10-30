@@ -35,12 +35,6 @@ import copy
 from operator import __and__
 import random
 
-# support for paycheck in Python 2.4
-try:
-    import functools
-except ImportError, _:
-    import functools_backport_24 as functools
-
 
 import paycheck.generator
 from paycheck import with_checker
