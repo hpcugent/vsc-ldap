@@ -32,20 +32,15 @@ Unit tests for the vsc.ldap.filters.
 """
 
 import copy
-from operator import __and__
 import random
 import string
-
-
-import paycheck.generator
-from paycheck import with_checker
-from paycheck.generator import BooleanGenerator, ChoiceGenerator, IntGenerator, PayCheckGenerator, StringGenerator
-from unittest import TestCase, TestLoader, main
+import unittest
+from unittest import TestCase, TestLoader
 
 from vsc.ldap.filters import LdapFilter
 
 
-class SingleChoiceGenerator(PayCheckGenerator):
+class SingleChoiceGenerator():
     """Provides a list of exhausting choices, reducing the choices until in each iteration."""
     def __init__(self, values):
         self.values = values
@@ -59,11 +54,10 @@ class SingleChoiceGenerator(PayCheckGenerator):
         return v
 
 
-class LdapFilterGenerator(PayCheckGenerator):
+class LdapFilterGenerator():
     """Generates random LdapFilter instances"""
 
     def __init__(self):
-        #super(LdapFilterGenerator, self).__init__()
 
         self.attributes = [
             'cn',
@@ -79,9 +73,6 @@ class LdapFilterGenerator(PayCheckGenerator):
             LdapFilter.negate,
         )
 
-        self.depth = IntGenerator(min=1, max=len(self.attributes))
-        self.operator_choice = ChoiceGenerator(self.operators)
-        self.side_generator = BooleanGenerator()
 
     def next(self):
 
@@ -89,11 +80,10 @@ class LdapFilterGenerator(PayCheckGenerator):
         attributes = copy.deepcopy(self.attributes)
         attribute_choice = SingleChoiceGenerator(attributes)
 
-        size = random.randint(1, self.depth.next())
-
+        size = random.randint(1, random.randint(1, len(self.attributes)))
         for d in xrange(0, size):
 
-            op = self.operator_choice.next()
+            op = random.choice(self.operators)
             at = attribute_choice.next()
 
             new = LdapFilter("%s=%s" % (at, ''.join([random.choice(string.printable) for x in xrange(16)])))
@@ -104,23 +94,21 @@ class LdapFilterGenerator(PayCheckGenerator):
                 if op == LdapFilter.negate:
                     ldap_filter = op(ldap_filter)
                 else:
-                    if self.side_generator.next():
+                    if random.choice([True, False]):
                         ldap_filter = op(new, ldap_filter)
                     else:
                         ldap_filter = op(ldap_filter, new)
 
         return ldap_filter
 
-
-paycheck.generator.scalar_generators[LdapFilter] = LdapFilterGenerator
-paycheck.generator.__all__.append('LdapFilterGenerator')
-
+LFG = LdapFilterGenerator()
 
 class TestLdapFilter(TestCase):
 
-    @with_checker(LdapFilter, LdapFilter)
-    def test_and(self, left, right):
+    def test_and(self):
         """Test the and operator for combining two filters."""
+        left = LFG.next()
+        right = LFG.next()
         combination = (left & right)
 
         left_string = "%s" % (left)
@@ -135,9 +123,10 @@ class TestLdapFilter(TestCase):
         if left.root == '&':
             self.assertFalse(combination_string[3] == '&')
 
-    @with_checker(LdapFilter, LdapFilter)
-    def test_or(self, left, right):
+    def test_or(self):
         """Test the or operator for combining two filters."""
+        left = LFG.next()
+        right = LFG.next()
         combination = left | right
 
         left_string = "%s" % (left)
@@ -152,9 +141,9 @@ class TestLdapFilter(TestCase):
         if left.root == '|':
             self.assertFalse(combination_string[3] == '|')
 
-    @with_checker(LdapFilter)
-    def test_negate(self, left):
+    def test_negate(self):
         """Test the negation operator of a filter."""
+        left = LFG.next()
         negation = left.negate()
 
         negation_string = "%s" % (negation)
@@ -163,12 +152,9 @@ class TestLdapFilter(TestCase):
         self.assertTrue(negation_string[1] == '!')
         self.assertTrue(negation_string[-1] == ')')
 
-    @with_checker([LdapFilter])
-    def test_from_list_and(self, fs):
+    def test_from_list_and(self):
         """Test the formation of a filters from a given list of filters using the and operator."""
-
-        if not fs or len(fs) < 2:
-            return
+        fs = [LFG.next() for x in xrange(random.randint(2,30))]
 
         combination = LdapFilter.from_list(lambda x, y: x & y, fs)
         combination_string = "%s" % (combination)
@@ -185,4 +171,4 @@ def suite():
     return TestLoader().loadTestsFromTestCase(TestLdapFilter)
 
 if __name__ == '__main__':
-    main()
+    unittest.TextTestRunner().run(suite())
