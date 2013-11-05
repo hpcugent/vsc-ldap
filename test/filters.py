@@ -34,6 +34,7 @@ Unit tests for the vsc.ldap.filters.
 import copy
 from operator import __and__
 import random
+import string
 
 
 import paycheck.generator
@@ -42,22 +43,6 @@ from paycheck.generator import BooleanGenerator, ChoiceGenerator, IntGenerator, 
 from unittest import TestCase, TestLoader, main
 
 from vsc.ldap.filters import LdapFilter
-
-
-class LdapAttributeStringGenerator(StringGenerator):
-    """Generate random string for use in LDAP filters.
-
-    Size should be limited!
-    """
-    def __init__(self, max_length):
-        """Initialise."""
-        super(LdapAttributeStringGenerator, self).__init__()
-        self.max_length = max_length
-
-    def __next__(self):
-        """Get the next random string."""
-        length = random.randint(0, self.max_length)
-        return ''.join([chr(random.randint(ord('a'), ord('z'))) for x in xrange(length)])
 
 
 class SingleChoiceGenerator(PayCheckGenerator):
@@ -96,7 +81,6 @@ class LdapFilterGenerator(PayCheckGenerator):
 
         self.depth = IntGenerator(min=1, max=len(self.attributes))
         self.operator_choice = ChoiceGenerator(self.operators)
-        self.value_generator = LdapAttributeStringGenerator(16)
         self.side_generator = BooleanGenerator()
 
     def next(self):
@@ -112,7 +96,7 @@ class LdapFilterGenerator(PayCheckGenerator):
             op = self.operator_choice.next()
             at = attribute_choice.next()
 
-            new = LdapFilter("%s=%s" % (at, self.value_generator.next()))
+            new = LdapFilter("%s=%s" % (at, ''.join([random.choice(string.printable) for x in xrange(16)])))
 
             if not ldap_filter:
                 ldap_filter = LdapFilter(new)
