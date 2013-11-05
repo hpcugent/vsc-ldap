@@ -40,7 +40,7 @@ from unittest import TestCase, TestLoader
 from vsc.ldap.filters import LdapFilter
 
 
-class SingleChoiceGenerator():
+class SingleChoiceGenerator(object):
     """Provides a list of exhausting choices, reducing the choices until in each iteration."""
     def __init__(self, values):
         self.values = values
@@ -54,7 +54,7 @@ class SingleChoiceGenerator():
         return v
 
 
-class LdapFilterGenerator():
+class LdapFilterGenerator(object):
     """Generates random LdapFilter instances"""
 
     def __init__(self):
