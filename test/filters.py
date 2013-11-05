@@ -35,10 +35,6 @@ import copy
 from operator import __and__
 import random
 
-try:
-    import functools
-except ImportError:
-    import test.functools_backport_24 as functools
 
 import paycheck.generator
 from paycheck import with_checker
