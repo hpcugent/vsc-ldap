@@ -1,6 +1,9 @@
 # vsc-ldap
 
-[![Build Status](https://jenkins1.ugent.be/job/vsc-ldap/badge/icon)](https://jenkins1.ugent.be/job/vsc-ldap/)
+### Build Status
+- Python 2.4 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python24/badge/icon)](https://jenkins1.ugent.be/job/vsc-base-python24/)
+- Python 2.6 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python26/badge/icon)](https://jenkins1.ugent.be/job/vsc-base-python26/)
+- Python 2.7 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python27/badge/icon)](https://jenkins1.ugent.be/job/vsc-base-python27/)
 
 This repository is part of the VSC tools, which are common tools used within our
 organization.
@@ -8,7 +11,7 @@ organization.
 Originally created by the HPC team of Ghent University (http://ugent.be/hpc).
 
 # Documentation
-https://jenkins1.ugent.be/view/VSC%20tools/job/vsc-ldap/Documentation/?
+https://jenkins1.ugent.be/view/VSC%20tools/job/vsc-ldap-python26/Documentation/?
 
 ### ldap Collection of utilities to ease interaction with the LDAP servers.
 Examples of the schema's used can be provided, although we do not include them
