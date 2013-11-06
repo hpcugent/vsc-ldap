@@ -1,9 +1,9 @@
 # vsc-ldap
 
 ### Build Status
-- Python 2.4 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python24/badge/icon)](https://jenkins1.ugent.be/job/vsc-base-python24/)
-- Python 2.6 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python26/badge/icon)](https://jenkins1.ugent.be/job/vsc-base-python26/)
-- Python 2.7 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python27/badge/icon)](https://jenkins1.ugent.be/job/vsc-base-python27/)
+- Python 2.4 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python24/badge/icon)](https://jenkins1.ugent.be/job/vsc-ldap-python24/)
+- Python 2.6 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python26/badge/icon)](https://jenkins1.ugent.be/job/vsc-ldap-python26/)
+- Python 2.7 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python27/badge/icon)](https://jenkins1.ugent.be/job/vsc-ldap-python27/)
 
 This repository is part of the VSC tools, which are common tools used within our
 organization.
