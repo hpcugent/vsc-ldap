@@ -40,6 +40,7 @@ from ldapurl import LDAPUrl
 from vsc.ldap.filters import CnFilter, LdapFilter, MemberFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
 from vsc.utils.fancylogger import getLogger
+from vsc.utils.missing import TryOrFail
 from vsc.utils.patterns import Singleton
 
 
@@ -110,6 +111,7 @@ class LdapConnection(object):
         self.configuration = configuration
         self.ldap_connection = None
 
+    @TryOrFail(3, (LdapError,), 10)
     def connect(self):
         """Connect to the LDAP server provided by the configuration.
 
@@ -127,6 +129,7 @@ class LdapConnection(object):
             except ldap.LDAPError:
                 self.log.raiseException("Failed to connect to the LDAP server at %s" % (url))
 
+    @TryOrFail(3, (LdapError,), 10)
     def bind(self):
         """Bind to the LDAP service.
 
@@ -571,6 +574,7 @@ class LdapQuery(object):
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
         self.ldap.add(dn, attributes.items())
 
+    @TryOrFail(3, (LdapError,), 10)
     def get_schema(self, ldap_obj_class_name_or_oid, reload=False):
         """Get attributes as provided by schema
 
