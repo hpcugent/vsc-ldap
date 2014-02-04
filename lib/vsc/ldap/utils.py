@@ -606,7 +606,7 @@ class LdapQuery(object):
             # returns ('cn=Subschema', <ldap.schema.subentry.SubSchema instance at 0x1986878>)
             schematype, schema = ldap.schema.subentry.urlfetch(self.ldap.ldap_url.unparse())
         except ldap.LDAPError:
-            self.log.raiseException("Failed to fetch schema from url %s" % (self.ldap.ldap_url))
+            self.log.raiseException("Failed to fetch schema")
 
         attributes = {}
 
