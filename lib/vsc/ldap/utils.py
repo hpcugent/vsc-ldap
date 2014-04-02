@@ -127,7 +127,7 @@ class LdapConnection(object):
                 self.ldap_url = LDAPUrl(ldapUrl=url)
                 break
             except ldap.LDAPError:
-                self.log.raiseException("Failed to connect to the LDAP server at %s" % (url))
+                self.log.raiseException("Failed to connect to the LDAP server at %s" % (url,))
 
     @TryOrFail(3, (ldap.LDAPError,), 10)
     def bind(self):
@@ -238,7 +238,7 @@ class LdapConnection(object):
         try:
             self.ldap_connection.modify_s(dn, mod_attrs)
         except ldap.LDAPError:
-            self.log.raiseException("Ldap update failed: dn %s, attribute %s, value %s: %s" % (dn, attribute, value))
+            self.log.raiseException("Ldap update failed: dn %s, attribute %s, value %s" % (dn, attribute, value))
 
     def modify_attributes(self, dn, changes):
         """Modify one or more attributes.
@@ -273,7 +273,7 @@ class LdapConnection(object):
         try:
             self.ldap_connection.add_s(dn, changes)
         except ldap.LDAPError:
-            self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]", (dn, changes))
+            self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]" % (dn, changes, attributes))
 
 
 class LdapQuery(object):
@@ -606,7 +606,7 @@ class LdapQuery(object):
             # returns ('cn=Subschema', <ldap.schema.subentry.SubSchema instance at 0x1986878>)
             schematype, schema = ldap.schema.subentry.urlfetch(self.ldap.ldap_url.unparse())
         except ldap.LDAPError:
-            self.log.raiseException("Failed to fetch schema from url %s" % (self.ldap.ldap_url))
+            self.log.raiseException("Failed to fetch schema")
 
         attributes = {}
 
@@ -683,7 +683,7 @@ class LdapEntity(object):
                 new_ldap_info = self.get_ldap_info()
                 object.__setattr__(self, 'ldap_info', new_ldap_info)
         except AttributeError:
-            self.log.raiseException("Tried to access an unknown attribute %s" % (name))
+            self.log.raiseException("Tried to access an unknown attribute %s" % (name,))
 
         if new_ldap_info and name in new_ldap_info:
             return new_ldap_info[name]
