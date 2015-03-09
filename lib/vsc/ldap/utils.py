@@ -43,6 +43,8 @@ from vsc.utils.fancylogger import getLogger
 from vsc.utils.missing import TryOrFail
 from vsc.utils.patterns import Singleton
 
+EMPTY_GECOS_DURING_MODIFY="EMPTYGECOSDURINGMODIFY"
+
 
 class LdapConfiguration(object):
     """Represents some LDAP configuration.
@@ -492,8 +494,9 @@ class LdapQuery(object):
         for key in attributes.keys():
             current_[key] = current.get(key, [])
             if current_[key] is '':
-                self.log.warning("Replacing empty string for key %s with EMPTYGECOSDURINGMODIFY before making modlist for dn %s" % (key, dn))
-                current_[key] = "EMPTYGECOSDURINGMODIFY"  # hack to allow replacing empty strings
+                self.log.warning("Replacing empty string for key %s with %s before making modlist for dn %s" %
+                                 (key, EMPTY_GECOS_DURING_MODIFY, dn))
+                current_[key] = EMPTY_GECOS_DURING_MODIFY  # hack to allow replacing empty strings
         # [(ldap.MOD_REPLACE, k, v) for (k,v) in attributes.iteritems()]
         modification_attributes = ldap.modlist.modifyModlist(current_, attributes)
 
