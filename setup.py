@@ -33,39 +33,17 @@ Setup for the vsc ldap utilities
 @author: Kenneth Hoste
 """
 
-try:
-    import vsc.install.shared_setup as shared_setup
-    from vsc.install.shared_setup import ag, kh, sdw, wdp
-except ImportError:
-    print "vsc.install could not be found, make sure a recent vsc-base is installed"
-    print "you might want to try 'easy_install [--user] https://github.com/hpcugent/vsc-base/archive/master.tar.gz'"
-
-
-def remove_bdist_rpm_source_file():
-    """List of files to remove from the (source) RPM."""
-    return ['lib/vsc/__init__.py']
-
-
-shared_setup.remove_extra_bdist_rpm_files = remove_bdist_rpm_source_file
-shared_setup.SHARED_TARGET.update({
-    'url': 'https://github.ugent.be/hpcugent/vsc-ldap',
-    'download_url': 'https://github.ugent.be/hpcugent/vsc-ldap'
-})
-
+import vsc.install.shared_setup as shared_setup
+from vsc.install.shared_setup import ag, kh, sdw, wdp
 
 PACKAGE = {
-    'name': 'vsc-ldap',
     'install_requires': [
-        'vsc-base >= 1.7.0',
+        'vsc-base >= 2.4.16',
         'python-ldap'
     ],
-    'version': '1.3.3',
+    'version': '1.3.4',
     'author': [ag, kh, sdw, wdp],
     'maintainer': [ag],
-    'packages': ['vsc', 'vsc.ldap'],
-    'namespace_packages': ['vsc'],
-    'scripts': [],
-    'provides': ['python-vsc-packages-ldap = 0.3'],
 }
 
 if __name__ == '__main__':

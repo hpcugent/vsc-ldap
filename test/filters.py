@@ -34,8 +34,7 @@ Unit tests for the vsc.ldap.filters.
 import copy
 import random
 import string
-import unittest
-from unittest import TestCase, TestLoader
+from vsc.install.testing import TestCase
 
 from vsc.ldap.filters import LdapFilter
 
@@ -164,11 +163,3 @@ class TestLdapFilter(TestCase):
         self.assertTrue(combination_string[0] == '(')
         self.assertTrue(combination_string[1] == '&')
         self.assertTrue(combination_string[-1] == ')')
-
-
-def suite():
-    """ return all the tests"""
-    return TestLoader().loadTestsFromTestCase(TestLdapFilter)
-
-if __name__ == '__main__':
-    unittest.TextTestRunner().run(suite())
