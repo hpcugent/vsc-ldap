@@ -34,15 +34,15 @@ Setup for the vsc ldap utilities
 """
 
 import vsc.install.shared_setup as shared_setup
-from vsc.install.shared_setup import ag, kh, sdw, wdp, jt
+from vsc.install.shared_setup import ag, kh, sdw, wdp
 
 PACKAGE = {
     'install_requires': [
         'vsc-base >= 2.4.16',
         'python-ldap'
     ],
-    'version': '1.3.5',
-    'author': [ag, kh, sdw, wdp, jt],
+    'version': '1.3.4',
+    'author': [ag, kh, sdw, wdp],
     'maintainer': [ag],
 }
 
