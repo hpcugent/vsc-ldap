@@ -38,11 +38,11 @@ from vsc.install.shared_setup import ag, kh, sdw, wdp, jt
 
 PACKAGE = {
     'install_requires': [
-        'vsc-base>=2.4.16',
-        'vsc-utils>=1.8.2',
+        'vsc-base >= 2.4.16',
+        'vsc-utils >= 1.8.2',
         'python-ldap'
     ],
-    'version': '1.4.1',
+    'version': '1.4.2',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
     'dependency_links': [
