@@ -6,7 +6,7 @@
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
 # with support of Ghent University (http://ugent.be/hpc),
 # the Flemish Supercomputer Centre (VSC) (https://vscentrum.be/nl/en),
-# the Hercules foundation (http://www.herculesstichting.be/in_English)
+# the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
 # and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
 #
 # https://github.com/hpcugent/vsc-ldap
@@ -112,7 +112,7 @@ class LdapGroup(LdapEntity):
 
         @returns: list of cls instances that match the given filter criteria
         """
-        ldap_query = LdapQuery()  # This should have been initialised earlier/elsewhere!
+        ldap_query = LdapQuery(None)  # This should have been initialised earlier/elsewhere!
 
         groups = ldap_query.group_filter_search(ldap_filter, attributes=['cn'])
 
