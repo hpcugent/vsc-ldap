@@ -5,7 +5,7 @@
 # This file is part of vsc-ldap,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
 # with support of Ghent University (http://ugent.be/hpc),
-# the Flemish Supercomputer Centre (VSC) (https://vscentrum.be/nl/en),
+# the Flemish Supercomputer Centre (VSC) (https://www.vscentrum.be),
 # the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
 # and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
 #
@@ -37,6 +37,8 @@ as all machines where we might require LDAP accesss.
 """
 
 # --------------------------------------------------------------------
+import logging
+
 from vsc.ldap import NoSuchUserError
 from vsc.ldap.filters import CnFilter
 from vsc.ldap.group import LdapGroup
@@ -102,33 +104,37 @@ class LdapUser(LdapEntity):
         """
         self.ldap_query.user_modify(self.user_id, attributes)
 
-    def get_group(self, reload=False):
+    def get_group(self, do_reload=False):
         """Return the LdapGroup that corresponds to this user.
 
-        Assumes the group has not changed. This can be overridden by providing the reload argument, otherwise, the
+        Assumes the group has not changed. This can be overridden by providing the do_reload argument, otherwise, the
         cached version will be returned.
 
-        @type reload: boolean that forces a reload of the group.
+        @type do_reload: boolean that forces a reload of the group.
 
         @returns: LdapGroup instance representing the group corresponding to the user.
         """
 
-        if not reload and self.group:
+        if not do_reload and self.group:
             return self.group
 
         self.group = LdapGroup(self.user_id)
 
         return self.group
 
-    def get_projects(self, ldap_filter=None, reload=False):
+    def get_projects(self, ldap_filter=None, do_reload=False):
         """Return the projects thus user participates in.
 
-        @type ldap_filter: LdapFilter object to apply to searching the projects.
+        @type ldap_filter: this argument is ignored
         @type reload: boolean that forces a reload of the group.
 
         @returns: list of LdapProject
         """
-        if not reload and not self.projects is None:
+        if ldap_filter is not None:
+            logging.warning('ldap_filter argument is ignored')
+        del ldap_filter
+
+        if not do_reload and not self.projects is None:
             return self.projects
 
         self.projects = LdapProject.get_for_member(self)

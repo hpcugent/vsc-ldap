@@ -5,7 +5,7 @@
 # This file is part of vsc-ldap,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
 # with support of Ghent University (http://ugent.be/hpc),
-# the Flemish Supercomputer Centre (VSC) (https://vscentrum.be/nl/en),
+# the Flemish Supercomputer Centre (VSC) (https://www.vscentrum.be),
 # the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
 # and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
 #
@@ -580,7 +580,7 @@ class LdapQuery(object):
         self.ldap.add(dn, attributes.items())
 
     @TryOrFail(3, (ldap.LDAPError,), 10)
-    def get_schema(self, ldap_obj_class_name_or_oid, reload=False):
+    def get_schema(self, ldap_obj_class_name_or_oid, do_reload=False):
         """Get attributes as provided by schema
 
         - we only do this once when it is requested
@@ -589,7 +589,7 @@ class LdapQuery(object):
 
         @type ldap_obj_class_name_or_oid: LDAP class name or OID to get the schema from
                                          (passed to ldap.schema.subentry.SubSchema)
-        @type reload: boolean indicating if the schema should be returned form the cache or reloaded from the LDAP
+        @type do_reload: boolean indicating if the schema should be returned form the cache or reloaded from the LDAP
                       server.
 
         @returns: dictionary containing details about the schema
@@ -602,7 +602,7 @@ class LdapQuery(object):
         if self.ldap is None:
             self.bind()
 
-        if not reload and ldap_obj_class_name_or_oid in self.schema:
+        if not do_reload and ldap_obj_class_name_or_oid in self.schema:
             return self.schema[ldap_obj_class_name_or_oid]
 
         self.schema[ldap_obj_class_name_or_oid] = {}
