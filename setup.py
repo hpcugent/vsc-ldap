@@ -40,15 +40,11 @@ PACKAGE = {
     'install_requires': [
         'vsc-base >= 2.4.16',
         'vsc-utils >= 1.8.2',
-        'python-ldap'
+        'python-ldap',
     ],
-    'version': '1.4.2',
+    'version': '1.4.3',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
-    'dependency_links': [
-        "git+https://github.com/hpcugent/vsc-utils.git#egg=vsc-utils-1.8.2",
-    ],
-
 }
 
 if __name__ == '__main__':
