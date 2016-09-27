@@ -30,6 +30,7 @@
 @author: Wouter Depypere
 """
 import ldap
+import logging
 import ldap.modlist
 import ldap.schema
 
@@ -579,8 +580,9 @@ class LdapQuery(object):
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
         self.ldap.add(dn, attributes.items())
 
+
     @TryOrFail(3, (ldap.LDAPError,), 10)
-    def get_schema(self, ldap_obj_class_name_or_oid, do_reload=False):
+    def get_schema(self, ldap_obj_class_name_or_oid, reload=False, do_reload=False):  #pylint: disable=redefined-builtin
         """Get attributes as provided by schema
 
         - we only do this once when it is requested
@@ -589,6 +591,7 @@ class LdapQuery(object):
 
         @type ldap_obj_class_name_or_oid: LDAP class name or OID to get the schema from
                                          (passed to ldap.schema.subentry.SubSchema)
+        @type reload: deprecated argument, do not use anymore, use do_reload
         @type do_reload: boolean indicating if the schema should be returned form the cache or reloaded from the LDAP
                       server.
 
@@ -599,6 +602,10 @@ class LdapQuery(object):
 
         @raise: LDAPError when the schema cannot be fetched for the given object class
         """
+        if reload:
+            logging.warning('usage of reload is deprecated, use do_reload instead')
+            do_reload = reload
+
         if self.ldap is None:
             self.bind()
 

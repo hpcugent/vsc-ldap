@@ -104,17 +104,20 @@ class LdapUser(LdapEntity):
         """
         self.ldap_query.user_modify(self.user_id, attributes)
 
-    def get_group(self, do_reload=False):
+    def get_group(self, reload=False, do_reload=False):  #pylint: disable=redefined-builtin
         """Return the LdapGroup that corresponds to this user.
 
         Assumes the group has not changed. This can be overridden by providing the do_reload argument, otherwise, the
         cached version will be returned.
 
         @type do_reload: boolean that forces a reload of the group.
+        @type reload: deprecated argument, do not use anymore, use do_reload
 
         @returns: LdapGroup instance representing the group corresponding to the user.
         """
-
+        if reload:
+            logging.warning('usage of reload is deprecated, use do_reload instead')
+            do_reload = reload
         if not do_reload and self.group:
             return self.group
 
@@ -122,10 +125,11 @@ class LdapUser(LdapEntity):
 
         return self.group
 
-    def get_projects(self, ldap_filter=None, do_reload=False):
+    def get_projects(self, ldap_filter=None, reload=False, do_reload=False):  #pylint: disable=redefined-builtin
         """Return the projects thus user participates in.
 
         @type ldap_filter: this argument is ignored
+        @type reload: deprecated argument, do not use anymore, use do_reload
         @type reload: boolean that forces a reload of the group.
 
         @returns: list of LdapProject
@@ -133,6 +137,10 @@ class LdapUser(LdapEntity):
         if ldap_filter is not None:
             logging.warning('ldap_filter argument is ignored')
         del ldap_filter
+
+        if reload:
+            logging.warning('usage of reload is deprecated, use do_reload instead')
+            do_reload = reload
 
         if not do_reload and not self.projects is None:
             return self.projects
