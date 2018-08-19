@@ -26,7 +26,7 @@ by default.
   autogroups, meaning their member list is built automagically.
 - __user__.py: A user in LDAP.
 - __utils.py__: Low-level LDAP utilities, such as making (and maintaining) a
-  bind the the LDAP server. Higher level utilities for querying LDAP and the
+  bind the LDAP server. Higher level utilities for querying LDAP and the
   base class for entitites in LDAP.
 - __vo.py__: A virtual organisation is a special kind of group.
 
