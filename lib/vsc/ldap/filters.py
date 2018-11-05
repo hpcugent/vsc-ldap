@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 #
-# Copyright 2009-2016 Ghent University
+# Copyright 2009-2018 Ghent University
 #
 # This file is part of vsc-ldap,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -75,7 +75,7 @@ fold & [f,g,h, g=1] -> (& (x=4) (y=5) (z=3) (g=1))
 """
 import copy
 
-from vsc.ldap.timestamp import convert_timestamp
+from vsc.utils.timestamp import convert_timestamp
 
 
 class LdapFilterError(Exception):
