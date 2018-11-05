@@ -106,8 +106,8 @@ class LdapConnection(object):
     def __init__(self, configuration):
         """Initialisation. Not done lazily.
 
-        @type configuration: vsc.ldap.utils.Configuration subclass instance, implementing the actual functions to request
-                             information.
+        @type configuration: vsc.ldap.utils.Configuration subclass instance,
+                             implementing the actual functions to request information.
         """
         self.log = getLogger(name=self.__class__.__name__)
         self.configuration = configuration
@@ -628,8 +628,9 @@ class LdapQuery(object):
                 for x in schema.attribute_types([ldap_obj_class_name_or_oid]):
                     attributes.update(x)
             except Exception:
-                self.log.raiseException("Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s"
-                                        % (schematype, ldap_obj_class_name_or_oid))
+                self.log.raiseException(
+                        "Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s"
+                        % (schematype, ldap_obj_class_name_or_oid))
         else:
             self.log.error('Unknown returned schematype %s' % schematype)
 
