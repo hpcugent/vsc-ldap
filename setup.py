@@ -42,6 +42,7 @@ PACKAGE = {
         'vsc-base >= 3.0.2',
         'vsc-utils >= 2.0.0',
         'python-ldap',
+        'future >= 0.16.0',
     ],
     'version': '2.0.0',
     'author': [ag, kh, sdw, wdp, jt],
