@@ -74,6 +74,7 @@ fold | [f,g,h] -> (| (x=4) (y=5) (z=3))
 fold & [f,g,h, g=1] -> (& (x=4) (y=5) (z=3) (g=1))
 """
 import copy
+from six.moves import reduce
 
 from vsc.utils.timestamp import convert_timestamp
 
