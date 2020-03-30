@@ -1,11 +1,11 @@
 # -*- coding: latin-1 -*-
 #
-# Copyright 2009-2016 Ghent University
+# Copyright 2009-2020 Ghent University
 #
 # This file is part of vsc-ldap,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
 # with support of Ghent University (http://ugent.be/hpc),
-# the Flemish Supercomputer Centre (VSC) (https://vscentrum.be/nl/en),
+# the Flemish Supercomputer Centre (VSC) (https://www.vscentrum.be),
 # the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
 # and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
 #
@@ -79,12 +79,12 @@ class LdapFilterGenerator(object):
         attribute_choice = SingleChoiceGenerator(attributes)
 
         size = random.randint(1, random.randint(1, len(self.attributes)))
-        for d in xrange(0, size):
+        for d in range(0, size):
 
             op = random.choice(self.operators)
             at = attribute_choice.next()
 
-            new = LdapFilter("%s=%s" % (at, ''.join([random.choice(string.printable) for x in xrange(16)])))
+            new = LdapFilter("%s=%s" % (at, ''.join([random.choice(string.printable) for x in range(16)])))
 
             if not ldap_filter:
                 ldap_filter = LdapFilter(new)
@@ -152,7 +152,7 @@ class TestLdapFilter(TestCase):
 
     def test_from_list_and(self):
         """Test the formation of a filters from a given list of filters using the and operator."""
-        fs = [LFG.next() for x in xrange(random.randint(2,30))]
+        fs = [LFG.next() for x in range(random.randint(2,30))]
 
         combination = LdapFilter.from_list(lambda x, y: x & y, fs)
         combination_string = "%s" % (combination)

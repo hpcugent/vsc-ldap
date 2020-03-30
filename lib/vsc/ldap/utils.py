@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 #
-# Copyright 2009-2018 Ghent University
+# Copyright 2009-2020 Ghent University
 #
 # This file is part of vsc-ldap,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -29,8 +29,10 @@
 @author: Stijn De Weirdt
 @author: Wouter Depypere
 """
-import ldap
 import logging
+from future.utils import with_metaclass
+
+import ldap
 import ldap.modlist
 import ldap.schema
 
@@ -43,7 +45,7 @@ from vsc.utils.fancylogger import getLogger
 from vsc.utils.missing import TryOrFail
 from vsc.utils.patterns import Singleton
 
-EMPTY_GECOS_DURING_MODIFY="EMPTYGECOSDURINGMODIFY"
+EMPTY_GECOS_DURING_MODIFY = "EMPTYGECOSDURINGMODIFY"
 
 
 class LdapConfiguration(object):
@@ -61,7 +63,7 @@ class LdapConfiguration(object):
         self.password = password
         self.connection_dn = connection_dn
         self.validation_method = validation_method
-        self.check_server_certificate = lambda : check_certificate
+        self.check_server_certificate = lambda: check_certificate
 
         self.log = getLogger(self.__class__.__name__)
 
@@ -278,7 +280,7 @@ class LdapConnection(object):
             self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]" % (dn, changes, attributes))
 
 
-class LdapQuery(object):
+class LdapQuery(with_metaclass(Singleton)):
     """Singleton class to interact with the LDAP server.
 
     This level is LDAP-schema aware. It knows about the dn for people, groups and projects.
@@ -291,7 +293,6 @@ class LdapQuery(object):
     If distinct group types that are required that are identified, e.g., by specific names, subclass LdapQuery
     and/or use the post_filter arguments.
     """
-    __metaclass__ = Singleton
 
     def __init__(self, configuration):
         """
@@ -709,7 +710,7 @@ class LdapEntity(object):
             if name in attributes:
                 return None
 
-            object.__getattribute__(self, name)
+            return object.__getattribute__(self, name)
 
     def __setattr__(self, name, value):
         """Setter for the LdapUser fields. Makes the change persistent in the LDAP database.
