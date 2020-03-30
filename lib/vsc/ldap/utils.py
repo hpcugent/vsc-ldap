@@ -30,7 +30,7 @@
 @author: Wouter Depypere
 """
 import logging
-from six import add_metaclass
+from future.utils import with_metaclass
 
 import ldap
 import ldap.modlist
@@ -280,8 +280,7 @@ class LdapConnection(object):
             self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]" % (dn, changes, attributes))
 
 
-@add_metaclass(Singleton)
-class LdapQuery(object):
+class LdapQuery(with_metaclass(Singleton)):
     """Singleton class to interact with the LDAP server.
 
     This level is LDAP-schema aware. It knows about the dn for people, groups and projects.
