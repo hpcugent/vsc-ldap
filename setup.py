@@ -37,6 +37,7 @@ import vsc.install.shared_setup as shared_setup
 from vsc.install.shared_setup import ag, kh, sdw, wdp, jt
 
 PACKAGE = {
+    'setup_requires': ['vsc-install >= 0.15.2'],
     'install_requires': [
         'vsc-base >= 3.0.2',
         'vsc-utils >= 2.0.0',
