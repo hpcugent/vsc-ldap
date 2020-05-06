@@ -4,6 +4,7 @@
 *.egg
 *.egg-info
 .eggs
+.eggs*
 dist
 build
 eggs
