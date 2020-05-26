@@ -30,7 +30,7 @@
 @author: Wouter Depypere
 """
 import logging
-from future.utils import with_metaclass, iteritems
+from future.utils import with_metaclass
 
 import ldap
 import ldap.modlist
@@ -480,7 +480,7 @@ class LdapQuery(with_metaclass(Singleton)):
         @type list_attributes
         @type attributes: attribute names we wish to retain
         """
-        kvs = [(k, v[0]) for (k, v) in iteritems(entry)
+        kvs = [(k, v[0]) for (k, v) in entry.items()
                if (list_attributes is None or k not in list_attributes)
                and (attributes is None or k in attributes)]
         # we do want to get all the attributes that provide multiple items
@@ -498,7 +498,7 @@ class LdapQuery(with_metaclass(Singleton)):
                 self.log.warning("Replacing empty string for key %s with %s before making modlist for dn %s" %
                                  (key, EMPTY_GECOS_DURING_MODIFY, dn))
                 current_[key] = EMPTY_GECOS_DURING_MODIFY  # hack to allow replacing empty strings
-        # [(ldap.MOD_REPLACE, k, v) for (k,v) in iteritems(attributes)]
+        # [(ldap.MOD_REPLACE, k, v) for (k,v) in attributes.items()]
         modification_attributes = ldap.modlist.modifyModlist(current_, attributes)
 
         self.ldap.modify_attributes(dn, modification_attributes)
