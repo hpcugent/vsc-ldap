@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 #
-# Copyright 2009-2020 Ghent University
+# Copyright 2009-2021 Ghent University
 #
 # This file is part of vsc-ldap,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -67,13 +67,13 @@ class LdapConfiguration(object):
 
         self.log = getLogger(self.__class__.__name__)
 
-    def tls_settings(self, url):
+    def tls_settings(self):
         """
         Set up the LDAP for a TLS connection.
         """
-
-        # FIXME:maybe we want some default configuration here?
-        pass
+        ldap.set_option(ldap.OPT_X_TLS_DEMAND, True)
+        ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, True)
+        ldap.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
 
 
 class SchemaConfiguration(LdapConfiguration):
