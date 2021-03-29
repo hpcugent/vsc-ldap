@@ -76,7 +76,7 @@ class LdapConfiguration(object):
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, True)
             ldap.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
         else:
-            self.log.warn("Not using TLS for LDAP connection, consider upgrading.")
+            self.log.warning("Not using TLS for LDAP connection, consider upgrading.")
 
 
 class SchemaConfiguration(LdapConfiguration):
