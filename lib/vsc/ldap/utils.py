@@ -67,13 +67,16 @@ class LdapConfiguration(object):
 
         self.log = getLogger(self.__class__.__name__)
 
-    def tls_settings(self):
+    def tls_settings(self, url):
         """
         Set up the LDAP for a TLS connection.
         """
-        ldap.set_option(ldap.OPT_X_TLS_DEMAND, True)
-        ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, True)
-        ldap.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
+        if url.startswith("ldaps"):
+            ldap.set_option(ldap.OPT_X_TLS_DEMAND, True)
+            ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, True)
+            ldap.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
+        else:
+            self.log.warn("Not using TLS for LDAP connection, consider upgrading.")
 
 
 class SchemaConfiguration(LdapConfiguration):
