@@ -91,8 +91,8 @@ class LdapUser(LdapEntity):
         cn_filter = CnFilter(self.user_id)
         user_ldap_info = self.ldap_query.user_filter_search(ldap_filter=cn_filter)
         if len(user_ldap_info) == 0:
-            self.log.error("Could not find a user in the LDAP with the ID %s, raising NoSuchUserError"
-                           % (self.user_id))
+            logging.error("Could not find a user in the LDAP with the ID %s, raising NoSuchUserError",
+                self.user_id)
             raise NoSuchUserError(name=self.user_id)
 
         return user_ldap_info[0]

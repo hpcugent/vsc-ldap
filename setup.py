@@ -44,7 +44,7 @@ PACKAGE = {
         'python-ldap',
         'future >= 0.16.0',
     ],
-    'version': '2.1.2',
+    'version': '2.1.3',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
 }
