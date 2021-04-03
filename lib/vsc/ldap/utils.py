@@ -134,7 +134,8 @@ class LdapConnection(object):
                 self.ldap_url = LDAPUrl(ldapUrl=url)
                 break
             except ldap.LDAPError:
-                self.log.raiseException("Failed to connect to the LDAP server at %s" % (url,))
+                self.log.exception("Failed to connect to the LDAP server at %s", url)
+                raise
 
     @TryOrFail(3, (ldap.LDAPError,), 10)
     def bind(self):
@@ -201,8 +202,9 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.search_s(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes)
         except ldap.LDAPError:
-            self.log.raiseException("Ldap sync search failed: base %s, ldap_filter %s, attributes %s",
+            self.log.exception("Ldap sync search failed: base %s, ldap_filter %s, attributes %s",
                                     base, ldap_filter, attributes)
+            raise
 
         return res
 
@@ -225,8 +227,9 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.search_st(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes, attrs_only, timeout)
         except ldap.LDAPError:
-            self.log.raiseException("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s: %s",
+            self.log.exception("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s:",
                                     base, ldap_filter, attributes)
+            raise
 
         return res
 
@@ -245,7 +248,8 @@ class LdapConnection(object):
         try:
             self.ldap_connection.modify_s(dn, mod_attrs)
         except ldap.LDAPError:
-            self.log.raiseException("Ldap update failed: dn %s, attribute %s, value %s", dn, attribute, value)
+            self.log.exception("Ldap update failed: dn %s, attribute %s, value %s", dn, attribute, value)
+            raise
 
     def modify_attributes(self, dn, changes):
         """Modify one or more attributes.
@@ -260,7 +264,8 @@ class LdapConnection(object):
         try:
             self.ldap_connection.modify_s(dn, changes)
         except ldap.LDAPError:
-            self.log.raiseException("Ldap update failed: dn %s, changes %s", dn, changes)
+            self.log.exception("Ldap update failed: dn %s, changes %s", dn, changes)
+            raise
 
     def add(self, dn, attributes):
         """Add an entry for the given distinguished name with the given attributes and their corresponding values.
@@ -280,7 +285,8 @@ class LdapConnection(object):
         try:
             self.ldap_connection.add_s(dn, changes)
         except ldap.LDAPError:
-            self.log.raiseException("Ldap add failed: dn %s, changes %s [%s]", dn, changes, attributes)
+            self.log.exception("Ldap add failed: dn %s, changes %s [%s]", dn, changes, attributes)
+            raise
 
 
 class LdapQuery(with_metaclass(Singleton)):
@@ -632,11 +638,12 @@ class LdapQuery(with_metaclass(Singleton)):
                 for x in schema.attribute_types([ldap_obj_class_name_or_oid]):
                     attributes.update(x)
             except Exception:
-                self.log.raiseException(
+                self.log.exception(
                         "Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s",
                         schematype, ldap_obj_class_name_or_oid)
+                raise
         else:
-            self.log.error('Unknown returned schematype %s' % schematype)
+            self.log.error('Unknown returned schematype %s', schematype)
 
         if len(attributes) == 0:
             self.log.error("No attributes from schematype %s and ldap_obj_class_name_or_oid %s",
@@ -702,7 +709,8 @@ class LdapEntity(object):
                 new_ldap_info = self.get_ldap_info()
                 object.__setattr__(self, 'ldap_info', new_ldap_info)
         except AttributeError:
-            self.log.raiseException("Tried to access an unknown attribute %s", name)
+            self.log.exception("Tried to access an unknown attribute %s", name)
+            raise
 
         if new_ldap_info and name in new_ldap_info:
             return new_ldap_info[name]
