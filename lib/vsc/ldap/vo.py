@@ -35,15 +35,10 @@ If this code is extended, it should be Python 2.4 compatible until such time
 as all machines where we might require LDAP accesss.
 """
 
-# --------------------------------------------------------------------
+import logging
 from vsc.ldap import NoSuchVoError
 from vsc.ldap.filters import CnFilter, MemberFilter
 from vsc.ldap.utils import LdapEntity
-from vsc.utils.fancylogger import getLogger
-
-
-_log = getLogger(__name__)
-
 
 class LdapVo(LdapEntity):
     """Representing a Virtual Organisation (VO) in the LDAP database.
@@ -80,7 +75,7 @@ class LdapVo(LdapEntity):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
         vo_ldap_info = self.ldap_query.vo_filter_search(CnFilter(self.vo_id))
         if len(vo_ldap_info) == 0:
-            self.log.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError",
+            logging.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError",
                            self.vo_id)
             raise NoSuchVoError(self.vo_id)
 
@@ -103,7 +98,9 @@ class LdapVo(LdapEntity):
 
         # there should be at most a single VO.
         if len(vos) > 1:
-            _log.raiseException("Found multiple VOs for the given user (%s), vos = %s" % (user, vos))
+            msg = "Found multiple VOs for the given user (%s), vos = %s" % (user, vos)
+            logging.error(msg)
+            raise Exception(msg)
 
         vo_info = vos[0]
 

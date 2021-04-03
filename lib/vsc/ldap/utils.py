@@ -38,10 +38,8 @@ import ldap.schema
 
 from ldapurl import LDAPUrl
 
-
 from vsc.ldap.filters import CnFilter, LdapFilter, MemberFilter
 from vsc.ldap import NoSuchUserError, NoSuchGroupError, NoSuchProjectError
-from vsc.utils.fancylogger import getLogger
 from vsc.utils.missing import TryOrFail
 from vsc.utils.patterns import Singleton
 
@@ -65,8 +63,6 @@ class LdapConfiguration(object):
         self.validation_method = validation_method
         self.check_server_certificate = lambda: check_certificate
 
-        self.log = getLogger(self.__class__.__name__)
-
     def tls_settings(self, url):
         """
         Set up the LDAP for a TLS connection.
@@ -76,7 +72,7 @@ class LdapConfiguration(object):
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, True)
             ldap.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
         else:
-            self.log.warning("Not using TLS for LDAP connection, consider upgrading.")
+            logging.warning("Not using TLS for LDAP connection, consider upgrading.")
 
 
 class SchemaConfiguration(LdapConfiguration):
@@ -114,7 +110,6 @@ class LdapConnection(object):
         @type configuration: vsc.ldap.utils.Configuration subclass instance,
                              implementing the actual functions to request information.
         """
-        self.log = getLogger(name=self.__class__.__name__)
         self.configuration = configuration
         self.ldap_connection = None
 
@@ -134,7 +129,7 @@ class LdapConnection(object):
                 self.ldap_url = LDAPUrl(ldapUrl=url)
                 break
             except ldap.LDAPError:
-                self.log.exception("Failed to connect to the LDAP server at %s", url)
+                logging.exception("Failed to connect to the LDAP server at %s", url)
                 raise
 
     @TryOrFail(3, (ldap.LDAPError,), 10)
@@ -148,16 +143,18 @@ class LdapConnection(object):
             try:
                 self.connect()
             except ldap.LDAPError:
-                self.log.raiseException("Binding to LDAP failed - no connection.")
+                logging.exception("Binding to LDAP failed - no connection.")
+                raise
 
         password = self.configuration.password
         dn = self.configuration.connection_dn
 
         try:
             res = self.ldap_connection.simple_bind_s(dn, password)
-            self.log.debug("Binding to LDAP with dn %s resulted in %s", dn, res)
+            logging.debug("Binding to LDAP with dn %s resulted in %s", dn, res)
         except ldap.LDAPError:
-            self.log.raiseException("Binding to LDAP failed")
+            logging.exception("Binding to LDAP failed")
+            raise
 
         # update url after succesful bind
         # WARNING self.ldap_url.unparse() will show the password. don't use it in logging !!
@@ -178,11 +175,11 @@ class LdapConnection(object):
         else:
             res = self.search_async_timeout(ldap_filter, base, attrs)
 
-        self.log.debug("Ldap search returned base %s, ldap_filter %s, attrs %s: %s", base, ldap_filter, attrs, res)
+        logging.debug("Ldap search returned base %s, ldap_filter %s, attrs %s: %s", base, ldap_filter, attrs, res)
 
         # refine result result=[('dn',{})[,()]] into [{}[,{}]]
         endres = [t[1] for t in res]
-        self.log.debug("Result reformed into %s", endres)
+        logging.debug("Result reformed into %s", endres)
 
         return endres
 
@@ -202,8 +199,8 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.search_s(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes)
         except ldap.LDAPError:
-            self.log.exception("Ldap sync search failed: base %s, ldap_filter %s, attributes %s",
-                                    base, ldap_filter, attributes)
+            logging.exception("Ldap sync search failed: base %s, ldap_filter %s, attributes %s",
+                base, ldap_filter, attributes)
             raise
 
         return res
@@ -227,8 +224,8 @@ class LdapConnection(object):
         try:
             res = self.ldap_connection.search_st(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes, attrs_only, timeout)
         except ldap.LDAPError:
-            self.log.exception("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s:",
-                               base, ldap_filter, attributes)
+            logging.exception("Ldap async timeout search failed: base %s, ldap_filter %s, attributes %s:",
+                base, ldap_filter, attributes)
             raise
 
         return res
@@ -248,7 +245,7 @@ class LdapConnection(object):
         try:
             self.ldap_connection.modify_s(dn, mod_attrs)
         except ldap.LDAPError:
-            self.log.exception("Ldap update failed: dn %s, attribute %s, value %s", dn, attribute, value)
+            logging.exception("Ldap update failed: dn %s, attribute %s, value %s", dn, attribute, value)
             raise
 
     def modify_attributes(self, dn, changes):
@@ -264,7 +261,7 @@ class LdapConnection(object):
         try:
             self.ldap_connection.modify_s(dn, changes)
         except ldap.LDAPError:
-            self.log.exception("Ldap update failed: dn %s, changes %s", dn, changes)
+            logging.exception("Ldap update failed: dn %s, changes %s", dn, changes)
             raise
 
     def add(self, dn, attributes):
@@ -280,12 +277,12 @@ class LdapConnection(object):
 
         changes = [(k, [v]) for (k, v) in attributes if not type(v) == list]
         changes.extend([(k, v) for (k, v) in attributes if type(v) == list])
-        self.log.info("Adding for dn=%s with changes = %s", dn, changes)
+        logging.info("Adding for dn=%s with changes = %s", dn, changes)
 
         try:
             self.ldap_connection.add_s(dn, changes)
         except ldap.LDAPError:
-            self.log.exception("Ldap add failed: dn %s, changes %s [%s]", dn, changes, attributes)
+            logging.exception("Ldap add failed: dn %s, changes %s [%s]", dn, changes, attributes)
             raise
 
 
@@ -312,7 +309,6 @@ class LdapQuery(with_metaclass(Singleton)):
         If you initialise using None as the configuration, this will not fail
         if the singleton has already been created.
         """
-        self.log = getLogger(name=self.__class__.__name__)
         self.configuration = configuration
         self.ldap = LdapConnection(configuration)
 
@@ -328,7 +324,7 @@ class LdapQuery(with_metaclass(Singleton)):
             (attribute, regex) = post_filter
             results = [r for r in results if regex.match(r[attribute])]
 
-        self.log.debug("_filter_search finds %d results", len(results))
+        logging.debug("_filter_search finds %d results", len(results))
         return results
 
     def group_filter_search(self, ldap_filter, attributes=None, post_filter=None):
@@ -346,11 +342,11 @@ class LdapQuery(with_metaclass(Singleton)):
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
         if not self.ldap:
-            self.log.error("LDAP search request (group_filter_search) failed: ldap not initialised")
+            logging.error("LDAP search request (group_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
         # for groups, we use the following base
-        self.log.debug("group_filter_search: ldap_filter = %s, requested attributes = %s", ldap_filter, attributes)
+        logging.debug("group_filter_search: ldap_filter = %s, requested attributes = %s", ldap_filter, attributes)
 
         return self._filter_search(self.configuration.group_dn_base,
                                    self.configuration.group_multi_value_attributes,
@@ -368,16 +364,16 @@ class LdapQuery(with_metaclass(Singleton)):
 
         @returns: the matching LDAP entry as a dictionary, limited to the requested attributes.
         """
-        self.log.debug("group_search: cn = %s, member_uid = %s, requested attributes = %s",
-                       cn, member_uid, attributes)
+        logging.debug("group_search: cn = %s, member_uid = %s, requested attributes = %s",
+            cn, member_uid, attributes)
         cn_filter = CnFilter(cn)
         member_filter = MemberFilter(member_uid)
         result = self.group_filter_search(cn_filter & member_filter, attributes)
-        self.log.debug("group_search for %s, %s yields %s", cn, member_uid, result)
+        logging.debug("group_search for %s, %s yields %s", cn, member_uid, result)
         if result is not None and len(result) > 0:
             return result[0]
         else:
-            self.log.debug("group_search returning None")
+            logging.debug("group_search returning None")
             return None
 
     def project_filter_search(self, ldap_filter, attributes=None, post_filter=None):
@@ -395,7 +391,7 @@ class LdapQuery(with_metaclass(Singleton)):
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
         if not self.ldap:
-            self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
+            logging.error("LDAP search request (user_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
         return self._filter_search(self.configuration.project_dn_base,
@@ -419,7 +415,7 @@ class LdapQuery(with_metaclass(Singleton)):
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
         if not self.ldap:
-            self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
+            logging.error("LDAP search request (user_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
         return self._filter_search(self.configuration.vo_dn_base,
@@ -443,11 +439,11 @@ class LdapQuery(with_metaclass(Singleton)):
         @raise ldap.OTHER if the LDAP connection was not properly instantiated
         """
         if not self.ldap:
-            self.log.error("LDAP search request (user_filter_search) failed: ldap not initialised")
+            logging.error("LDAP search request (user_filter_search) failed: ldap not initialised")
             raise ldap.OTHER()
 
         # For users, we use the following base:
-        self.log.debug("user_filter_search: filter = %s, requested attributes = %s", ldap_filter, attributes)
+        logging.debug("user_filter_search: filter = %s, requested attributes = %s", ldap_filter, attributes)
         return self._filter_search(self.configuration.user_dn_base,
                                    self.configuration.user_multi_value_attributes,
                                    ldap_filter,
@@ -471,11 +467,11 @@ class LdapQuery(with_metaclass(Singleton)):
         institute_filter = LdapFilter("institute=%s" % (institute))
 
         result = self.user_filter_search(login_filter & institute_filter, attributes)
-        self.log.debug("user_search for %s, %s yields %s", user_id, institute, result)
+        logging.debug("user_search for %s, %s yields %s", user_id, institute, result)
         if result is not None and len(result) > 0:
             return result[0]
         else:
-            self.log.debug("user_search returning None")
+            logging.debug("user_search returning None")
             return None
 
     def __delist_ldap_return_value(self, entry, list_attributes=None, attributes=None):
@@ -504,8 +500,8 @@ class LdapQuery(with_metaclass(Singleton)):
         for key in attributes.keys():
             current_[key] = current.get(key, [])
             if current_[key] is '':
-                self.log.warning("Replacing empty string for key %s with %s before making modlist for dn %s",
-                                 key, EMPTY_GECOS_DURING_MODIFY, dn)
+                logging.warning("Replacing empty string for key %s with %s before making modlist for dn %s",
+                    key, EMPTY_GECOS_DURING_MODIFY, dn)
                 current_[key] = EMPTY_GECOS_DURING_MODIFY  # hack to allow replacing empty strings
         # [(ldap.MOD_REPLACE, k, v) for (k,v) in attributes.items()]
         modification_attributes = ldap.modlist.modifyModlist(current_, attributes)
@@ -523,10 +519,10 @@ class LdapQuery(with_metaclass(Singleton)):
         dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
         current = self.group_filter_search(CnFilter(cn))
         if current is None:
-            self.log.error("group_modify did not find group with cn = %s (dn = %s)", cn, dn)
+            logging.error("group_modify did not find group with cn = %s (dn = %s)", cn, dn)
             raise NoSuchGroupError(cn)
-        self.log.debug("group_modify current attribute values = %s - new attribute values = %s",
-                       current[0], attributes)
+        logging.debug("group_modify current attribute values = %s - new attribute values = %s",
+            current[0], attributes)
         self.__modify(current[0], dn, attributes)
 
     def user_modify(self, cn, attributes):
@@ -540,10 +536,10 @@ class LdapQuery(with_metaclass(Singleton)):
         dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
         current = self.user_filter_search(CnFilter(cn))
         if current is None:
-            self.log.error("user_modify did not find user with cn = %s (dn = %s)", cn, dn)
+            logging.error("user_modify did not find user with cn = %s (dn = %s)", cn, dn)
             raise NoSuchUserError(cn)
-        self.log.debug("user_modify current attribute values = %s - new attribute values = %s",
-                       current[0], attributes)
+        logging.debug("user_modify current attribute values = %s - new attribute values = %s",
+            current[0], attributes)
         self.__modify(current[0], dn, attributes)
 
     def project_modify(self, cn, attributes):
@@ -557,10 +553,10 @@ class LdapQuery(with_metaclass(Singleton)):
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
         current = self.project_filter_search(CnFilter(cn))
         if current is None:
-            self.log.error("project_modify did not find project with cn = %s (dn = %s)", cn, dn)
+            logging.error("project_modify did not find project with cn = %s (dn = %s)", cn, dn)
             raise NoSuchProjectError(cn)
-        self.log.debug("project_modify current attribute values = %s - new attribute values = %s",
-                       current[0], attributes)
+        logging.debug("project_modify current attribute values = %s - new attribute values = %s",
+            current[0], attributes)
         self.__modify(current[0], dn, attributes)
 
     def user_add(self, cn, attributes):
@@ -628,7 +624,8 @@ class LdapQuery(with_metaclass(Singleton)):
             # returns ('cn=Subschema', <ldap.schema.subentry.SubSchema instance at 0x1986878>)
             schematype, schema = ldap.schema.subentry.urlfetch(self.ldap.ldap_url.unparse())
         except ldap.LDAPError:
-            self.log.raiseException("Failed to fetch schema")
+            logging.exception("Failed to fetch schema")
+            raise
 
         attributes = {}
 
@@ -638,15 +635,15 @@ class LdapQuery(with_metaclass(Singleton)):
                 for x in schema.attribute_types([ldap_obj_class_name_or_oid]):
                     attributes.update(x)
             except Exception:
-                self.log.exception(
+                logging.exception(
                         "Failed to retrieve attributes from schematype %s and ldap_obj_class_name_or_oid %s",
                         schematype, ldap_obj_class_name_or_oid)
                 raise
         else:
-            self.log.error('Unknown returned schematype %s', schematype)
+            logging.error('Unknown returned schematype %s', schematype)
 
         if len(attributes) == 0:
-            self.log.error("No attributes from schematype %s and ldap_obj_class_name_or_oid %s",
+            logging.error("No attributes from schematype %s and ldap_obj_class_name_or_oid %s",
                            schematype, ldap_obj_class_name_or_oid)
             return None
 
@@ -656,7 +653,7 @@ class LdapQuery(with_metaclass(Singleton)):
             name = attr.names[0]
             if len(attr.names) > 1:
                 # what with multiple names?
-                self.log.error("Multiple names associated with attr, only using first one. From %s: oid %s names %s",
+                logging.error("Multiple names associated with attr, only using first one. From %s: oid %s names %s",
                                ldap_obj_class_name_or_oid, oid, attr.names)
 
             self.schema[ldap_obj_class_name_or_oid][name] = {}
@@ -680,8 +677,6 @@ class LdapEntity(object):
         self.ldap_info = None
 
         self.object_classes = object_classes  # LDAP object class name for which the schema will be checked
-
-        self.log = getLogger(self.__class__.__name__)
 
     def get_ldap_info(self):
         pass
@@ -709,7 +704,7 @@ class LdapEntity(object):
                 new_ldap_info = self.get_ldap_info()
                 object.__setattr__(self, 'ldap_info', new_ldap_info)
         except AttributeError:
-            self.log.exception("Tried to access an unknown attribute %s", name)
+            logging.exception("Tried to access an unknown attribute %s", name)
             raise
 
         if new_ldap_info and name in new_ldap_info:
@@ -746,7 +741,7 @@ class LdapEntity(object):
                     self.modify_ldap({name: ldap_value})
                     self.ldap_info[name] = value
                 except ldap.LDAPError:
-                    self.log.error("Could not save the new value %s for %s with cn=%s to the LDAP",
+                    logging.error("Could not save the new value %s for %s with cn=%s to the LDAP",
                                    value, name, self.vsc_user_id)
                     pass
             else:

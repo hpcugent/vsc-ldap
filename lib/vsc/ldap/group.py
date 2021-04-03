@@ -35,7 +35,7 @@ If this code is extended, it should be Python 2.4 compatible until such time
 as all machines where we might require LDAP accesss.
 """
 
-# --------------------------------------------------------------------
+import logging
 from vsc.ldap import NoSuchGroupError
 from vsc.ldap.utils import LdapEntity, LdapQuery
 
@@ -76,8 +76,8 @@ class LdapGroup(LdapEntity):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
         group_ldap_info = self.ldap_query.group_filter_search("cn=%s" % (self.group_id))
         if len(group_ldap_info) == 0:
-            self.log.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError",
-                           self.group_id)
+            logging.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError",
+                self.group_id)
             raise NoSuchGroupError(self.group_id)
 
         return group_ldap_info[0]  # there can be only one

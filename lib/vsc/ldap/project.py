@@ -35,7 +35,7 @@ If this code is extended, it should be Python 2.4 compatible until such time
 as all machines where we might require LDAP accesss.
 """
 
-# --------------------------------------------------------------------
+import logging
 from vsc.ldap import NoSuchProjectError
 from vsc.ldap.utils import LdapEntity
 
@@ -81,7 +81,7 @@ class LdapProject(LdapEntity):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
         project_ldap_info = self.ldap_query.project_filter_search("cn=%s" % (self.project_id))
         if len(project_ldap_info) == 0:
-            self.log.error("Could not find a project in the LDAP with the ID %s, raising NoSuchGroupError",
+            logging.error("Could not find a project in the LDAP with the ID %s, raising NoSuchGroupError",
                            self.project_id)
             raise NoSuchProjectError(self.project_id)
 
