@@ -41,10 +41,10 @@ PACKAGE = {
     'install_requires': [
         'vsc-base >= 3.0.2',
         'vsc-utils >= 2.0.0',
-        'python-ldap',
+        'python-ldap <= 3.3.0',
         'future >= 0.16.0',
     ],
-    'version': '2.1.3',
+    'version': '2.1.4',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
 }
