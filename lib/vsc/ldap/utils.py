@@ -679,7 +679,7 @@ class LdapEntity(object):
         self.object_classes = object_classes  # LDAP object class name for which the schema will be checked
 
     def get_ldap_info(self):
-        pass
+        return None
 
     def modify_ldap(self, attributes):
         """Actually make modifications in the LDAP.
