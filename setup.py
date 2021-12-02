@@ -37,9 +37,11 @@ import sys
 import vsc.install.shared_setup as shared_setup
 from vsc.install.shared_setup import ag, kh, sdw, wdp, jt
 install_requires = [
-        'vsc-base >= 3.0.2',
-        'vsc-utils >= 2.0.0',
-        'future >= 0.16.0',
+    'vsc-accountpage-clients >= 2.1.6',
+    'vsc-base >= 3.0.2',
+    'vsc-config >= 3.0.0',
+    'vsc-utils >= 2.0.0',
+    'future >= 0.16.0',
 ]
 
 
@@ -52,7 +54,7 @@ else:
 PACKAGE = {
     'setup_requires': ['vsc-install >= 0.15.2'],
     'install_requires': install_requires,
-    'version': '2.1.4',
+    'version': '3.0.0',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
 }
