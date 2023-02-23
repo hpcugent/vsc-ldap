@@ -43,7 +43,7 @@ install_requires = [
 PACKAGE = {
     'setup_requires': ['vsc-install >= 0.15.2'],
     'install_requires': install_requires,
-    'version': '2.1.4',
+    'version': '2.2.0',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
 }
