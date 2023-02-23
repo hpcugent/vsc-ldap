@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 #
-# Copyright 2009-2021 Ghent University
+# Copyright 2009-2023 Ghent University
 #
 # This file is part of vsc-ldap,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -30,7 +30,6 @@
 @author: Wouter Depypere
 """
 import logging
-from future.utils import with_metaclass
 
 import ldap
 import ldap.modlist
@@ -286,7 +285,7 @@ class LdapConnection(object):
             raise
 
 
-class LdapQuery(with_metaclass(Singleton)):
+class LdapQuery(metaclass=Singleton):
     """Singleton class to interact with the LDAP server.
 
     This level is LDAP-schema aware. It knows about the dn for people, groups and projects.
