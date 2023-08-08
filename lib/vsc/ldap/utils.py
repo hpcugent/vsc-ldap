@@ -491,7 +491,13 @@ class LdapQuery(metaclass=Singleton):
         for a in list_attributes:
             if (attributes is None or a in attributes) and a in entry:
                 kvs.append((a, entry[a]))
-        return dict(kvs)
+
+        kvs = dict(kvs)
+        for k in kvs:
+            if isinstance(kvs[k], bytes):
+                kvs[k] = kvs[k].decode('utf-8')
+
+        return kvs
 
     def __modify(self, current, dn, attributes):
         """Actually make the modification."""
@@ -502,6 +508,9 @@ class LdapQuery(metaclass=Singleton):
                 logging.warning("Replacing empty string for key %s with %s before making modlist for dn %s",
                     key, EMPTY_GECOS_DURING_MODIFY, dn)
                 current_[key] = EMPTY_GECOS_DURING_MODIFY  # hack to allow replacing empty strings
+
+        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values] for key, values in attributes.items()}
+
         # [(ldap.MOD_REPLACE, k, v) for (k,v) in attributes.items()]
         modification_attributes = ldap.modlist.modifyModlist(current_, attributes)
 
@@ -565,6 +574,7 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
+        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values] for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
     def group_add(self, cn, attributes):
@@ -574,6 +584,7 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
+        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values] for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
     def project_add(self, cn, attributes):
@@ -583,6 +594,7 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
+        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values] for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
 
