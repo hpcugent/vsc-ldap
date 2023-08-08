@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: latin-1 -*-
+# -*- coding: utf-8 -*-
 ##
 # Copyright 2009-2012 Ghent University
 #
@@ -32,17 +32,17 @@ Setup for the vsc ldap utilities
 @author: Wouter Depypere
 @author: Kenneth Hoste
 """
-import vsc.install.shared_setup as shared_setup
+from vsc.install import shared_setup
 from vsc.install.shared_setup import ag, kh, sdw, wdp, jt
-install_requires = [
-    'vsc-base >= 3.0.2',
-    'vsc-utils >= 2.0.0',
-    'python-ldap',
-]
 
 PACKAGE = {
     'setup_requires': ['vsc-install >= 0.15.2'],
-    'install_requires': install_requires,
+    'install_requires': [
+        'vsc-base >= 3.0.2',
+        'vsc-utils >= 2.0.0',
+        'future >= 0.16.0',
+        'python-ldap',
+    ],
     'version': '2.2.0',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],

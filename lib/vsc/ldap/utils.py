@@ -1,4 +1,4 @@
-# -*- coding: latin-1 -*-
+# -*- coding: utf-8 -*-
 #
 # Copyright 2009-2023 Ghent University
 #
@@ -509,7 +509,8 @@ class LdapQuery(metaclass=Singleton):
                     key, EMPTY_GECOS_DURING_MODIFY, dn)
                 current_[key] = EMPTY_GECOS_DURING_MODIFY  # hack to allow replacing empty strings
 
-        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values] for key, values in attributes.items()}
+        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values]
+                      for key, values in attributes.items()}
 
         # [(ldap.MOD_REPLACE, k, v) for (k,v) in attributes.items()]
         modification_attributes = ldap.modlist.modifyModlist(current_, attributes)
@@ -574,7 +575,8 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
-        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values] for key, values in attributes.items()}
+        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values]
+                      for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
     def group_add(self, cn, attributes):
@@ -584,7 +586,8 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
-        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values] for key, values in attributes.items()}
+        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values]
+                      for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
     def project_add(self, cn, attributes):
@@ -594,7 +597,8 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
-        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values] for key, values in attributes.items()}
+        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values]
+                      for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
 
