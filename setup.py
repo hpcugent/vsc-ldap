@@ -36,14 +36,14 @@ from vsc.install import shared_setup
 from vsc.install.shared_setup import ag, kh, sdw, wdp, jt
 
 PACKAGE = {
-    'setup_requires': ['vsc-install >= 0.15.2'],
+    'setup_requires': ['vsc-install >= 0.18.8'],
     'install_requires': [
         'vsc-base >= 3.0.2',
         'vsc-utils >= 2.0.0',
         'future >= 0.16.0',
         'python-ldap',
     ],
-    'version': '2.2.1',
+    'version': '2.2.2',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
 }
