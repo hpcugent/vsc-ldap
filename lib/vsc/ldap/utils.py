@@ -509,8 +509,8 @@ class LdapQuery(metaclass=Singleton):
                     key, EMPTY_GECOS_DURING_MODIFY, dn)
                 current_[key] = EMPTY_GECOS_DURING_MODIFY  # hack to allow replacing empty strings
 
-        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values]
-                      for key, values in attributes.items()}
+            if isinstance(attributes[key], list):
+                attributes[key] = [v.encode("utf-8") if isinstance(v, str) else v for v in attributes[key]]
 
         # [(ldap.MOD_REPLACE, k, v) for (k,v) in attributes.items()]
         modification_attributes = ldap.modlist.modifyModlist(current_, attributes)
