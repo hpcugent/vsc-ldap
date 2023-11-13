@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2009-2023 Ghent University
 #
@@ -69,12 +68,12 @@ class LdapGroup(LdapEntity):
 
         @raise NoSuchGroupError if the group cannot be found.
         """
-        super(LdapGroup, self).__init__(self.LDAP_OBJECT_CLASS_ATTRIBUTES)
+        super().__init__(self.LDAP_OBJECT_CLASS_ATTRIBUTES)
         self.group_id = group_id
 
     def get_ldap_info(self):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
-        group_ldap_info = self.ldap_query.group_filter_search("cn=%s" % (self.group_id))
+        group_ldap_info = self.ldap_query.group_filter_search(f"cn={self.group_id}")
         if len(group_ldap_info) == 0:
             logging.error("Could not find a group in the LDAP with the ID %s, raising NoSuchGroupError",
                 self.group_id)

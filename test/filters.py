@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2009-2023 Ghent University
 #
@@ -38,7 +37,7 @@ from vsc.install.testing import TestCase
 from vsc.ldap.filters import LdapFilter
 
 
-class SingleChoiceGenerator(object):
+class SingleChoiceGenerator:
     """Provides a list of exhausting choices, reducing the choices until in each iteration."""
     def __init__(self, values):
         self.values = values
@@ -52,7 +51,7 @@ class SingleChoiceGenerator(object):
         return v
 
 
-class LdapFilterGenerator(object):
+class LdapFilterGenerator:
     """Generates random LdapFilter instances"""
 
     def __init__(self):
@@ -79,12 +78,12 @@ class LdapFilterGenerator(object):
         attribute_choice = SingleChoiceGenerator(attributes)
 
         size = random.randint(1, random.randint(1, len(self.attributes)))
-        for d in range(0, size):
+        for _ in range(0, size):
 
             op = random.choice(self.operators)
             at = attribute_choice.next()
 
-            new = LdapFilter("%s=%s" % (at, ''.join([random.choice(string.printable) for x in range(16)])))
+            new = LdapFilter(f"{at}={''.join([random.choice(string.printable) for x in range(16)])}")
 
             if not ldap_filter:
                 ldap_filter = LdapFilter(new)
@@ -107,11 +106,11 @@ class TestLdapFilter(TestCase):
         """Test the and operator for combining two filters."""
         left = LFG.next()
         right = LFG.next()
-        combination = (left & right)
+        combination = left & right
 
-        left_string = "%s" % (left)
-        right_string = "%s" % (right)
-        combination_string = "%s" % (combination)
+        left_string = f"{left}"
+        right_string = f"{right}"
+        combination_string = f"{combination}"
 
         self.assertTrue(len(combination_string) <= 3 + len(left_string) + len(right_string))
         self.assertTrue(combination_string[0] == '(')
@@ -127,9 +126,9 @@ class TestLdapFilter(TestCase):
         right = LFG.next()
         combination = left | right
 
-        left_string = "%s" % (left)
-        right_string = "%s" % (right)
-        combination_string = "%s" % (combination)
+        left_string = f"{left}"
+        right_string = f"{right}"
+        combination_string = f"{combination}"
 
         self.assertTrue(len(combination_string) <= 3 + len(left_string) + len(right_string))
         self.assertTrue(combination_string[0] == '(')
@@ -144,7 +143,7 @@ class TestLdapFilter(TestCase):
         left = LFG.next()
         negation = left.negate()
 
-        negation_string = "%s" % (negation)
+        negation_string = f"{negation}"
 
         self.assertTrue(negation_string[0] == '(')
         self.assertTrue(negation_string[1] == '!')
@@ -155,9 +154,9 @@ class TestLdapFilter(TestCase):
         fs = [LFG.next() for x in range(random.randint(2,30))]
 
         combination = LdapFilter.from_list(lambda x, y: x & y, fs)
-        combination_string = "%s" % (combination)
+        combination_string = f"{combination}"
 
-        self.assertTrue(len(combination_string) <= 3 + sum(map(lambda f: len("%s" % (f)), fs)))
+        self.assertTrue(len(combination_string) <= 3 + sum(map(lambda f: len(f"{f}"), fs)))
 
         self.assertTrue(combination_string[0] == '(')
         self.assertTrue(combination_string[1] == '&')

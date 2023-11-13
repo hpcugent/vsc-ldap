@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2009-2023 Ghent University
 #
@@ -74,12 +73,12 @@ class LdapProject(LdapEntity):
 
         @raise NoSuchProjectError if the project cannot be found.
         """
-        super(LdapProject, self).__init__(self.LDAP_OBJECT_CLASS_ATTRIBUTES)
+        super().__init__(self.LDAP_OBJECT_CLASS_ATTRIBUTES)
         self.project_id = project_id
 
     def get_ldap_info(self):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
-        project_ldap_info = self.ldap_query.project_filter_search("cn=%s" % (self.project_id))
+        project_ldap_info = self.ldap_query.project_filter_search(f"cn={self.project_id}")
         if len(project_ldap_info) == 0:
             logging.error("Could not find a project in the LDAP with the ID %s, raising NoSuchGroupError",
                            self.project_id)
@@ -113,7 +112,7 @@ class LdapProject(LdapEntity):
         """
 
         # get all the projects in the LDAP
-        projects_info = user.ldap_query.projects_filter_search("memberUid=%s" % user.user_id)
+        projects_info = user.ldap_query.projects_filter_search(f"memberUid={user.user_id}")
 
         projects = []
         for p_info in projects_info:
