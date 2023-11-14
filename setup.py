@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 ##
 # Copyright 2009-2012 Ghent University
 #
@@ -43,7 +42,7 @@ PACKAGE = {
         'future >= 0.16.0',
         'python-ldap',
     ],
-    'version': '2.2.2',
+    'version': '2.2.3',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
 }

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2009-2023 Ghent University
 #
@@ -45,7 +44,7 @@ from vsc.utils.patterns import Singleton
 EMPTY_GECOS_DURING_MODIFY = "EMPTYGECOSDURINGMODIFY"
 
 
-class LdapConfiguration(object):
+class LdapConfiguration:
     """Represents some LDAP configuration.
 
     @param url: url to ldap server (default None)
@@ -78,7 +77,7 @@ class SchemaConfiguration(LdapConfiguration):
     """Represents an LDAP configuration with some extra schema-related information."""
 
     def __init__(self):
-        super(SchemaConfiguration, self).__init__()
+        super().__init__()
 
         self.user_dn_base = None
         self.group_dn_base = None
@@ -91,7 +90,7 @@ class SchemaConfiguration(LdapConfiguration):
         self.vo_multi_value_attributes = None
 
 
-class LdapConnection(object):
+class LdapConnection:
     """Represents a connection to an LDAP server.
 
     - Offers a set of convenience functions for querying and updating the server.
@@ -111,6 +110,7 @@ class LdapConnection(object):
         """
         self.configuration = configuration
         self.ldap_connection = None
+        self.ldap_url = None
 
     @TryOrFail(3, (ldap.LDAPError,), 10)
     def connect(self):
@@ -193,7 +193,7 @@ class LdapConnection(object):
             self.bind()
 
         # ldap_filter can also be an LdapFilter instance
-        ldap_filter = "%s" % ldap_filter
+        ldap_filter = f"{ldap_filter}"
 
         try:
             res = self.ldap_connection.search_s(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes)
@@ -218,7 +218,7 @@ class LdapConnection(object):
         attrs_only = False
 
         # filter can also be LdapFilter instance
-        ldap_filter = "%s" % ldap_filter
+        ldap_filter = f"{ldap_filter}"
 
         try:
             res = self.ldap_connection.search_st(base, ldap.SCOPE_SUBTREE, ldap_filter, attributes, attrs_only, timeout)
@@ -274,8 +274,8 @@ class LdapConnection(object):
         if self.ldap_connection is None:
             self.bind()
 
-        changes = [(k, [v]) for (k, v) in attributes if not type(v) == list]
-        changes.extend([(k, v) for (k, v) in attributes if type(v) == list])
+        changes = [(k, [v]) for (k, v) in attributes if not isinstance(v, list)]
+        changes.extend([(k, v) for (k, v) in attributes if isinstance(v, list)])
         logging.info("Adding for dn=%s with changes = %s", dn, changes)
 
         try:
@@ -462,8 +462,8 @@ class LdapQuery(metaclass=Singleton):
 
         @returns: a dictionary, with the values for the requested attributes for the given user
         """
-        login_filter = LdapFilter("instituteLogin=%s" % (user_id))
-        institute_filter = LdapFilter("institute=%s" % (institute))
+        login_filter = LdapFilter(f"instituteLogin={user_id}")
+        institute_filter = LdapFilter(f"institute={institute}")
 
         result = self.user_filter_search(login_filter & institute_filter, attributes)
         logging.debug("user_search for %s, %s yields %s", user_id, institute, result)
@@ -504,7 +504,7 @@ class LdapQuery(metaclass=Singleton):
         current_ = {}
         for key in attributes.keys():
             current_[key] = current.get(key, [])
-            if current_[key] is '':
+            if current_[key] == '':
                 logging.warning("Replacing empty string for key %s with %s before making modlist for dn %s",
                     key, EMPTY_GECOS_DURING_MODIFY, dn)
                 current_[key] = EMPTY_GECOS_DURING_MODIFY  # hack to allow replacing empty strings
@@ -525,7 +525,7 @@ class LdapQuery(metaclass=Singleton):
 
         @raise: NoSuchGroupError
         """
-        dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
+        dn = f"cn={cn},{self.configuration.group_dn_base}"
         current = self.group_filter_search(CnFilter(cn))
         if current is None:
             logging.error("group_modify did not find group with cn = %s (dn = %s)", cn, dn)
@@ -542,7 +542,7 @@ class LdapQuery(metaclass=Singleton):
 
         @raise: NoSuchUserError
         """
-        dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
+        dn = f"cn={cn},{self.configuration.user_dn_base}"
         current = self.user_filter_search(CnFilter(cn))
         if current is None:
             logging.error("user_modify did not find user with cn = %s (dn = %s)", cn, dn)
@@ -559,7 +559,7 @@ class LdapQuery(metaclass=Singleton):
 
         @raise: NoSuchProjectError
         """
-        dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
+        dn = f"cn={cn},{self.configuration.project_dn_base}"
         current = self.project_filter_search(CnFilter(cn))
         if current is None:
             logging.error("project_modify did not find project with cn = %s (dn = %s)", cn, dn)
@@ -574,8 +574,8 @@ class LdapQuery(metaclass=Singleton):
         @type cn: string representing the common name for the user. Together with the subtree, this forms the dn.
         @type attributes: dictionary with attributes for which a value should be added
         """
-        dn = "cn=%s,%s" % (cn, self.configuration.user_dn_base)
-        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values]
+        dn = f"cn={cn},{self.configuration.user_dn_base}"
+        attributes = {key:[v.encode("utf-8") if isinstance(v, str) else v for v in values]
                       for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
@@ -585,8 +585,8 @@ class LdapQuery(metaclass=Singleton):
         @type cn: string representing the common name for the group. Together with the subtree, this forms the dn.
         @type attributes: dictionary with attributes for which a value should be added
         """
-        dn = "cn=%s,%s" % (cn, self.configuration.group_dn_base)
-        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values]
+        dn = f"cn={cn},{self.configuration.group_dn_base}"
+        attributes = {key:[v.encode("utf-8") if isinstance(v, str) else v for v in values]
                       for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
@@ -596,8 +596,8 @@ class LdapQuery(metaclass=Singleton):
         @type cn: string representing the common name for the project. Together with the subtree, this forms the dn.
         @type attributes: dictionary with attributes for which a value should be added
         """
-        dn = "cn=%s,%s" % (cn, self.configuration.project_dn_base)
-        attributes = {key:[v.encode("utf-8") if type(v) == str else v for v in values]
+        dn = f"cn={cn},{self.configuration.project_dn_base}"
+        attributes = {key:[v.encode("utf-8") if isinstance(v, str) else v for v in values]
                       for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
@@ -678,7 +678,7 @@ class LdapQuery(metaclass=Singleton):
         return self.schema[ldap_obj_class_name_or_oid]
 
 
-class LdapEntity(object):
+class LdapEntity:
     """Base class for all things LDAP that work on a higher level."""
 
     def __init__(self, object_classes=None):
@@ -703,7 +703,6 @@ class LdapEntity(object):
 
         Should be iplemented by deriving classes.
         """
-        pass
 
     def __getattr__(self, name):
         """Getter for the LdapUser fields. Only accessed for fields that are in
@@ -758,7 +757,6 @@ class LdapEntity(object):
                 except ldap.LDAPError:
                     logging.error("Could not save the new value %s for %s with cn=%s to the LDAP",
                                    value, name, self.vsc_user_id)
-                    pass
             else:
                 object.__setattr__(self, name, value)
         except AttributeError:

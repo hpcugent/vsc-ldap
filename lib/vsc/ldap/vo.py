@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2009-2023 Ghent University
 #
@@ -69,7 +68,7 @@ class LdapVo(LdapEntity):
 
         @raise NoSuchVoError if the VO cannot be found.
         """
-        super(LdapVo, self).__init__(vo_id)
+        super().__init__(vo_id)
 
     def get_ldap_info(self):
         """Retrieve the data from the LDAP to initially fill up the ldap_info field."""
@@ -98,9 +97,9 @@ class LdapVo(LdapEntity):
 
         # there should be at most a single VO.
         if len(vos) > 1:
-            msg = "Found multiple VOs for the given user (%s), vos = %s" % (user, vos)
+            msg = f"Found multiple VOs for the given user ({user}), vos = {vos}"
             logging.error(msg)
-            raise Exception(msg)
+            raise ValueError(msg)
 
         vo_info = vos[0]
 

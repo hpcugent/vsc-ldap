@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2009-2023 Ghent University
 #
@@ -83,7 +82,7 @@ class LdapFilterError(Exception):
     pass
 
 
-class LdapFilter(object):
+class LdapFilter:
     """Representing an LDAP filter with operators between the filter values.
 
     This is implemented as a tree, where the nodes are the operations, e.g.,
@@ -172,7 +171,7 @@ class LdapFilter(object):
 
         if self.left is None:
             # single value, self.root should be a string not representing an operator
-            return "(%s)" % (self.root)
+            return f"({self.root})"
 
         left_string = self.left._to_string(self.root)
         if not self.right is None:
@@ -181,9 +180,9 @@ class LdapFilter(object):
             right_string = ""
 
         if self.root == previous_operator:
-            return "%s%s" % (left_string, right_string)
+            return f"{left_string}{right_string}"
         else:
-            return "(%s%s%s)" % (self.root, left_string, right_string)
+            return f"({self.root}{left_string}{right_string})"
 
     def _combine(self, operator, value=None):
         """Updates the tree with a new root, i.e., the given operator and
@@ -215,7 +214,7 @@ class TimestampFilter(LdapFilter):
                          will be converted to a format LDAP groks.
         @type comparator: string representing a comparison operation, e.g., <=, >=
         """
-        super(TimestampFilter, self).__init__(value)
+        super().__init__(value)
         self.timestamp = convert_timestamp(timestamp)[1]
         if comparator != '>=' and comparator != '<=':
             raise LdapFilterError()
@@ -223,9 +222,7 @@ class TimestampFilter(LdapFilter):
 
     def __str__(self):
         """Converts the filter to an LDAP understood string."""
-        return "(& (modifyTimestamp%s%s) %s)" % (self.comparator,
-                                                 self.timestamp,
-                                                 super(TimestampFilter, self).__str__())
+        return f"(& (modifyTimestamp{self.comparator}{self.timestamp}) {super().__str__()})"
 
 
 class NewerThanFilter(TimestampFilter):
@@ -237,7 +234,7 @@ class NewerThanFilter(TimestampFilter):
         @type timestamp: string or datetime instance representing a timestamp. This value
                          will be converted to a format LDAP groks.
         """
-        super(NewerThanFilter, self).__init__(value, timestamp, '>=')
+        super().__init__(value, timestamp, '>=')
 
 
 class OlderThanFilter(TimestampFilter):
@@ -249,32 +246,32 @@ class OlderThanFilter(TimestampFilter):
         @type timestamp: string or datetime instance representing a timestamp. This value
                          will be converted to a format LDAP groks.
         """
-        super(OlderThanFilter, self).__init__(value, timestamp, '<=')
+        super().__init__(value, timestamp, '<=')
 
 
 class CnFilter(LdapFilter):
     """Representa a filter that matches a given common name."""
 
     def __init__(self, cn):
-        super(CnFilter, self).__init__("cn=%s" % (cn))
+        super().__init__(f"cn={cn}")
 
 
 class MemberFilter(LdapFilter):
     """Represents a filter that looks if a member is listed in the memberUid."""
 
     def __init__(self, user_id):
-        super(MemberFilter, self).__init__("memberUid=%s" % (user_id))
+        super().__init__(f"memberUid={user_id}")
 
 
 class LoginFilter(LdapFilter):
     """Represents a filter that looks up a user based on his institute login name."""
 
     def __init__(self, login):
-        super(LoginFilter, self).__init__("login=%s" % (login))
+        super().__init__(f"login={login}")
 
 
 class InstituteFilter(LdapFilter):
     """Represents a filter that looks up a user based on his institute login name."""
 
     def __init__(self, institute):
-        super(InstituteFilter, self).__init__("institute=%s" % (institute))
+        super().__init__(f"institute={institute}")

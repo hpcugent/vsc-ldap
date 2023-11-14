@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2009-2023 Ghent University
 #
@@ -78,7 +77,7 @@ class LdapUser(LdapEntity):
 
         @type user_id: string representing the ID of the user, i.e., his cn in LDAP.
         """
-        super(LdapUser, self).__init__(self.LDAP_OBJECT_CLASS_ATTRIBUTES)
+        super().__init__(self.LDAP_OBJECT_CLASS_ATTRIBUTES)
 
         self.user_id = user_id
         self.vo = None
