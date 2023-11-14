@@ -274,8 +274,11 @@ class LdapConnection:
         if self.ldap_connection is None:
             self.bind()
 
-        changes = [(k, [v]) for (k, v) in attributes if not isinstance(v, list)]
-        changes.extend([(k, v) for (k, v) in attributes if isinstance(v, list)])
+        def attr_encode(value):
+            return [x.encode("utf-8") if isinstance(x, str) else x for x in value]
+
+        changes = [(k, [v.encode("utf-8")]) for (k, v) in attributes if not isinstance(v, list)]
+        changes.extend([(k, attr_encode(v)) for (k, v) in attributes if isinstance(v, list)])
         logging.info("Adding for dn=%s with changes = %s", dn, changes)
 
         try:
@@ -575,8 +578,6 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = f"cn={cn},{self.configuration.user_dn_base}"
-        attributes = {key:[v.encode("utf-8") if isinstance(v, str) else v for v in values]
-                      for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
     def group_add(self, cn, attributes):
@@ -586,8 +587,6 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = f"cn={cn},{self.configuration.group_dn_base}"
-        attributes = {key:[v.encode("utf-8") if isinstance(v, str) else v for v in values]
-                      for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
     def project_add(self, cn, attributes):
@@ -597,8 +596,6 @@ class LdapQuery(metaclass=Singleton):
         @type attributes: dictionary with attributes for which a value should be added
         """
         dn = f"cn={cn},{self.configuration.project_dn_base}"
-        attributes = {key:[v.encode("utf-8") if isinstance(v, str) else v for v in values]
-                      for key, values in attributes.items()}
         self.ldap.add(dn, attributes.items())
 
 
