@@ -2,10 +2,6 @@
 
 A set of ldap utilities and modules to deal with VSC LDAP.
 
-### Build Status
-- Python 2.6 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python26/badge/icon)](https://jenkins1.ugent.be/job/vsc-ldap-python26/)
-- Python 2.7 : [![Build Status](https://jenkins1.ugent.be/job/vsc-ldap-python27/badge/icon)](https://jenkins1.ugent.be/job/vsc-ldap-python27/)
-
 This repository is part of the VSC tools, which are common tools used within our
 organization.
 

@@ -39,7 +39,6 @@ PACKAGE = {
     'install_requires': [
         'vsc-base >= 3.0.2',
         'vsc-utils >= 2.0.0',
-        'future >= 0.16.0',
         'python-ldap',
     ],
     'version': '2.2.3',
