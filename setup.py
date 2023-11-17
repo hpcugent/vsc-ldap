@@ -41,7 +41,7 @@ PACKAGE = {
         'vsc-utils >= 2.0.0',
         'python-ldap',
     ],
-    'version': '2.2.3',
+    'version': '2.2.4',
     'author': [ag, kh, sdw, wdp, jt],
     'maintainer': [ag],
 }
